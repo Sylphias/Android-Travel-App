@@ -1,4 +1,4 @@
-package com.example.weiren.travelapp;
+package com.example.hermes.travelapp;
 
 import org.junit.Test;
 
