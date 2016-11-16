@@ -120,11 +120,32 @@ public class TravelSQL extends SQLiteOpenHelper {
 
     /*
         Return a Location object.
+        Takes a String detailing location.
+        PS: not doing any checks - Assumes First Letter Caps, and direct match to location.
      */
     public Location getEntryFrom(String s){
-        //not doing any checks - Assumes First Letter Caps, and direct match to location.
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res = db.rawQuery("select * from sqlitetable where location="+s,null);
+        Location ret = new Location(
+                res.getString(res.getColumnIndex("id")), //id starts from 1, handled in Location constructor
+                res.getString(res.getColumnIndex("location")),
+                res.getString(res.getColumnIndex("publiccost")),
+                res.getString(res.getColumnIndex("publictime")),
+                res.getString(res.getColumnIndex("privatecost")),
+                res.getString(res.getColumnIndex("privatetime")),
+                res.getString(res.getColumnIndex("foottime"))
+        );
+        return ret;
+    }
+
+    /*
+        Return a Location object.
+        Takes an integer detailing id.
+        (MBS = 0, Flyer = 1...) the method does the +1.
+     */
+    public Location getEntryFrom(int i){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select * from sqlitetable where id="+String.valueOf(i+1),null);
         Location ret = new Location(
                 res.getString(res.getColumnIndex("id")), //id starts from 1, handled in Location constructor
                 res.getString(res.getColumnIndex("location")),
