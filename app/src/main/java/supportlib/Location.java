@@ -7,20 +7,76 @@ import java.util.Arrays;
  */
 public class Location {
     public int id;
-    public String location;
-    public float[] publiccost;
-    public int[] publictime;
-    public float[] privatecost;
-    public int[] privatetime;
-    public int[] foottime;
+    private String location;
+    private float[] publiccost;
+    private int[] publictime;
+    private float[] privatecost;
+    private int[] privatetime;
+    private int[] foottime;
 
-    public Location(String id,String location, String pc,String pt,String pvc,String pvt,String ft){
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public float[] getPubliccost() {
+        return publiccost;
+    }
+
+    public void setPubliccost(float[] publiccost) {
+        this.publiccost = publiccost;
+    }
+
+    public int[] getPublictime() {
+        return publictime;
+    }
+
+    public void setPublictime(int[] publictime) {
+        this.publictime = publictime;
+    }
+
+    public float[] getPrivatecost() {
+        return privatecost;
+    }
+
+    public void setPrivatecost(float[] privatecost) {
+        this.privatecost = privatecost;
+    }
+
+    public int[] getPrivatetime() {
+        return privatetime;
+    }
+
+    public void setPrivatetime(int[] privatetime) {
+        this.privatetime = privatetime;
+    }
+
+    public int[] getFoottime() {
+        return foottime;
+    }
+
+    public void setFoottime(int[] foottime) {
+        this.foottime = foottime;
+    }
+
+    public Location(String id, String location, String pc, String pt, String pvc, String pvt, String ft){
         this.id = Integer.parseInt(id)-1; //id starts from 1 in sqlite
         this.location = location;
 
         //publiccost = Arrays.stream(pc.split(",")).map(String::trim).mapToInt(Integer::parseInt).toArray(); //API 24 :(
         String[] pca = pc.split(",");
-        publiccost = new float[pca.length];
+        this.publiccost = new float[pca.length];
         for(int i = 0;i<pca.length;i++){
             try{
                 publiccost[i] = Float.parseFloat(pca[i]);
@@ -29,7 +85,7 @@ public class Location {
             }
         }
         pca = pt.split(","); //can do this b/c everything is length 6
-        publictime = new int[pca.length];
+        this.publictime = new int[pca.length];
         for(int i = 0;i<pca.length;i++){
             try{
                 publictime[i] = Integer.parseInt(pca[i]);
@@ -39,7 +95,7 @@ public class Location {
         }
 
         pca = pvc.split(",");
-        privatecost = new float[pca.length];
+        this.privatecost = new float[pca.length];
         for(int i = 0;i<pca.length;i++){
             try{
                 privatecost[i] = Float.parseFloat(pca[i]);
@@ -48,7 +104,7 @@ public class Location {
             }
         }
         pca = pvt.split(",");
-        privatetime = new int[pca.length];
+        this.privatetime = new int[pca.length];
         for(int i = 0;i<pca.length;i++){
             try{
                 privatetime[i] = Integer.parseInt(pca[i]);
@@ -58,7 +114,7 @@ public class Location {
         }
 
         pca = ft.split(",");
-        foottime = new int[pca.length];
+        this.foottime = new int[pca.length];
         for(int i = 0;i<pca.length;i++){
             try{
                 foottime[i] = Integer.parseInt(pca[i]);

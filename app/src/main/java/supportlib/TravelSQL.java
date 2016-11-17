@@ -16,7 +16,7 @@ public class TravelSQL extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create table if not exists sqlitetable (id integer primary key, location text, publictime text,privatetime text,foottime text, publiccost text, privatecost text)");
+        db.execSQL("create table if not exists LocationsTable (id integer primary key, location text, publictime text,privatetime text,foottime text, publiccost text, privatecost text)");
         ContentValues cv = new ContentValues();
         cv.put("location","Marina Bay Sands");
         cv.put("publiccost","0.0,0.83,1.18,4.03,0.88,1.96");
@@ -24,7 +24,7 @@ public class TravelSQL extends SQLiteOpenHelper {
         cv.put("privatecost","0.0,3.22,6.96,8.50,4.98,18.40");
         cv.put("privatetime","0,3,14,19,8,30");
         cv.put("foottime","0,14,69,76,28,269");
-        db.insert("sqlitetable",null,cv);
+        db.insert("LocationsTable",null,cv);
 
         cv = new ContentValues();
         cv.put("location","Singapore Flyer");
@@ -33,7 +33,7 @@ public class TravelSQL extends SQLiteOpenHelper {
         cv.put("privatecost","4.32,0.0,7.84,9.38,4.76,18.18");
         cv.put("privatetime","6,0,13,18,8,29");
         cv.put("foottime","14,0,81,88,39,264");
-        db.insert("sqlitetable",null,cv);
+        db.insert("LocationsTable",null,cv);
 
         cv = new ContentValues();
         cv.put("location","Vivo City");
@@ -42,7 +42,7 @@ public class TravelSQL extends SQLiteOpenHelper {
         cv.put("privatecost","8.30,7.96,0.0,4.54,6.42,22.58");
         cv.put("privatetime","12,14,0,9,11,31");
         cv.put("foottime","69,81,0,12,47,270");
-        db.insert("sqlitetable",null,cv);
+        db.insert("LocationsTable",null,cv);
 
         cv = new ContentValues();
         cv.put("location","Resorts World Sentosa");
@@ -51,7 +51,7 @@ public class TravelSQL extends SQLiteOpenHelper {
         cv.put("privatecost","8.74,8.40,3.22,0.0,6.64,22.80");
         cv.put("privatetime","13,14,4,0,12,32");
         cv.put("foottime","76,88,12,0,55,285");
-        db.insert("sqlitetable",null,cv);
+        db.insert("LocationsTable",null,cv);
 
         cv = new ContentValues();
         cv.put("location","Buddha Tooth Relic Temple");
@@ -60,7 +60,7 @@ public class TravelSQL extends SQLiteOpenHelper {
         cv.put("privatecost","5.32,4.76,4.98,6.52,0.0,18.40");
         cv.put("privatetime","7,8,9,14,0,30");
         cv.put("foottime","28,39,47,55,0,264");
-        db.insert("sqlitetable",null,cv);
+        db.insert("LocationsTable",null,cv);
 
         cv = new ContentValues();
         cv.put("location","Zoo");
@@ -69,30 +69,21 @@ public class TravelSQL extends SQLiteOpenHelper {
         cv.put("privatecost","22.48,19.40,21.48,23.68,21.60,0.0");
         cv.put("privatetime","32,29,32,36,30,0");
         cv.put("foottime","269,264,270,285,264,0");
-        db.insert("sqlitetable",null,cv);
+        db.insert("LocationsTable",null,cv);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         //versions unused
-        db.execSQL("DROP TABLE IF EXISTS sqlitetable");
+        db.execSQL("DROP TABLE IF EXISTS LocationsTable");
         onCreate(db);
     }
 
-//    public boolean insertEntry(String location, String phone, String address){
-//        SQLiteDatabase db = this.getWritableDatabase();
-//        ContentValues contentValues = new ContentValues();
-//        contentValues.put("location", location);
-//        contentValues.put("phone", phone);
-//        contentValues.put("address", address);
-//        db.insert("sqlitetable", null, contentValues);
-//        return true;
-//    }
 
     public ArrayList<Location> getAllEntries() {
         ArrayList<Location> array_list = new ArrayList<Location>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "select * from sqlitetable", null );
+        Cursor res =  db.rawQuery( "select * from LocationsTable", null );
         res.moveToFirst();
 
         while(res.isAfterLast() == false){
@@ -105,13 +96,6 @@ public class TravelSQL extends SQLiteOpenHelper {
                     res.getString(res.getColumnIndex("privatetime")),
                     res.getString(res.getColumnIndex("foottime"))
             ));
-//            array_list.add(res.getString(res.getColumnIndex("id"))); // id starts from 1
-//            array_list.add(res.getString(res.getColumnIndex("location")));
-//            array_list.add(res.getString(res.getColumnIndex("publictime")));
-//            array_list.add(res.getString(res.getColumnIndex("privatetime")));
-//            array_list.add(res.getString(res.getColumnIndex("foottime")));
-//            array_list.add(res.getString(res.getColumnIndex("publiccost")));
-//            array_list.add(res.getString(res.getColumnIndex("privatecost")));
             res.moveToNext();
         }
         res.close();
@@ -125,7 +109,9 @@ public class TravelSQL extends SQLiteOpenHelper {
      */
     public Location getEntryFrom(String s){
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("select * from sqlitetable where location="+s,null);
+        Cursor res = db.rawQuery("select * from LocationsTable where location="+s,null);
+        res.moveToFirst();
+
         Location ret = new Location(
                 res.getString(res.getColumnIndex("id")), //id starts from 1, handled in Location constructor
                 res.getString(res.getColumnIndex("location")),
@@ -145,7 +131,9 @@ public class TravelSQL extends SQLiteOpenHelper {
      */
     public Location getEntryFrom(int i){
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("select * from sqlitetable where id="+String.valueOf(i+1),null);
+        Cursor res = db.rawQuery("select * from LocationsTable WHERE id = "+String.valueOf(i+1),null);
+        res.moveToFirst();
+//        Cursor res = db.rawQuery("select * from LocationsTable where id=1",null);
         Location ret = new Location(
                 res.getString(res.getColumnIndex("id")), //id starts from 1, handled in Location constructor
                 res.getString(res.getColumnIndex("location")),
@@ -160,7 +148,7 @@ public class TravelSQL extends SQLiteOpenHelper {
 
     public boolean deleteTable(){
         SQLiteDatabase db = this.getReadableDatabase();
-        db.execSQL("delete from sqlitetable");
+        db.execSQL("delete from LocationsTable");
         return true;
     }
 }

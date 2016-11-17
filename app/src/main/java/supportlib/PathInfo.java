@@ -1,0 +1,81 @@
+package supportlib;
+
+/**
+ * Created by Ilya on 17/11/16.
+ */
+
+public class PathInfo {
+    String to, from;
+    int toId, fromId;
+    double cost;
+    TRANSPORTATION mode;
+
+    public PathInfo(String to, String from, int toId, int fromId, double cost, TRANSPORTATION mode) {
+        this.to = to;
+        this.from = from;
+        this.toId = toId;
+        this.fromId = fromId;
+        this.cost = cost;
+        this.mode = mode;
+    }
+
+    public PathInfo( String to, String from,int toId,int fromId) {
+        this.fromId = fromId;
+        this.to = to;
+        this.from = from;
+        this.toId = toId;
+    }
+
+
+    public String getTo() {
+        return to;
+    }
+
+    public void setTo(String to) {
+        this.to = to;
+    }
+
+    public String getFrom() {
+        return from;
+    }
+
+    public void setFrom(String from) {
+        this.from = from;
+    }
+
+    public int getToId() {
+        return toId;
+    }
+
+    public void setToId(int toId) {
+        this.toId = toId;
+    }
+
+    public int getFromId() {
+        return fromId;
+    }
+
+    public void setFromId(int fromId) {
+        this.fromId = fromId;
+    }
+
+    public double getCost() {
+        return cost;
+    }
+
+    public void setCost(double cost) {
+        this.cost = cost;
+    }
+
+    public TRANSPORTATION getMode() {
+        return mode;
+    }
+
+    public void setMode(TRANSPORTATION mode) {
+        this.mode = mode;
+    }
+}
+
+enum TRANSPORTATION{
+    WALKING, BUS, TAXI;
+}
