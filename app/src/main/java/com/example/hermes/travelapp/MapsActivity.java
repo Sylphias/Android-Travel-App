@@ -22,12 +22,17 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private LatLng curr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,16 +43,23 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        final Button locationSubmit = (Button)findViewById(R.id.mapSubmitBtn);
-        locationSubmit.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
+        final Button locationSubmit = (Button) findViewById(R.id.mapSubmitBtn);
+        locationSubmit.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
                 hideKeyboard(MapsActivity.this);
                 onMapSearch(v);
             }
         });
+        final Button nearbySubmit = (Button) findViewById(R.id.mapNearbyButton);
+        nearbySubmit.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                //hideKeyboard(MapsActivity.this);
+                nearbySearch(v);
+            }
+        });
     }
 
-    public static void hideKeyboard(Activity act){
+    public static void hideKeyboard(Activity act) {
         InputMethodManager inputMethodManager = (InputMethodManager) act.getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(act.getCurrentFocus().getWindowToken(), 0);
     }
@@ -64,9 +76,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng singapore = new LatLng(1.352083, 103.819836);
-        mMap.addMarker(new MarkerOptions().position(singapore).title("Marker in Singapore"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(singapore, 10.0f));
+        curr = new LatLng(1.352083, 103.819836);
+        mMap.addMarker(new MarkerOptions().position(curr).title("Marker in Singapore"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(curr, 10.0f));
     }
 
     public void onMapSearch(View view) {
@@ -76,27 +88,28 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Context context = getApplicationContext();
         int duration = Toast.LENGTH_SHORT;
 
-        if (location != null || !location.equals("") || location.length()!=0) {
+        if (location != null || !location.equals("") || location.length() != 0) {
             Geocoder geocoder = new Geocoder(this);
             try {
-                    //only sets preference, not a restriction
-                    addressList = geocoder.getFromLocationName(location, 1,1.216988,103.589401,1.475781,104.099579);
-                    if(addressList.size() > 0){
+                //only sets preference, not a restriction
+                addressList = geocoder.getFromLocationName(location, 1, 1.216988, 103.589401, 1.475781, 104.099579);
+
+                if (addressList.size() > 0) {
                     Address address = addressList.get(0);
-                    LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                    curr = new LatLng(address.getLatitude(), address.getLongitude());
                     mMap.clear();
-                    mMap.addMarker(new MarkerOptions().position(latLng));
-                    mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+                    mMap.addMarker(new MarkerOptions().position(curr));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLng(curr));
 //                    String loc = address.getLocality()+" in "+address.getCountryName();
 //                    Toast toast = Toast.makeText(context,loc,duration);
 //                    toast.show();
-                }else{
-                    Toast toast = Toast.makeText(context,"Location Unknown",duration);
+                } else {
+                    Toast toast = Toast.makeText(context, "Location Unknown", duration);
                     toast.show();
                 }
             } catch (IOException e) {
                 System.err.println(e);
-                Toast toast = Toast.makeText(context,"Location Unknown",duration);
+                Toast toast = Toast.makeText(context, "Location Unknown", duration);
                 toast.show();
             }
         }
@@ -126,5 +139,79 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return super.onOptionsItemSelected(item);
 
         }
+    }
+
+//    public ArrayList<ArrayList<String>> getHawkerLocations() {
+//        String line = null;
+//        InputStream is = getResources().openRawResource(R.raw.hawkers);
+//        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+//        try {
+//            while ((line = br.readLine()) != null) {
+//
+//            }
+//        }catch(IOException ioe){
+//            ioe.printStackTrace();
+//        }
+//    }
+    public void nearbySearch(View v){
+        ArrayList<ArrayList<String>> nearby = getNearbyHawkers(getHawkerLocations(),curr.latitude,curr.longitude);
+        if(nearby.size() ==0){
+            Toast toast = Toast.makeText(getApplicationContext(), "No nearby hawkers", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+        for(int i =0;i<nearby.size();i++){
+            LatLng mark = new LatLng(Double.parseDouble(nearby.get(i).get(1)),Double.parseDouble(nearby.get(i).get(0)));
+            mMap.addMarker(new MarkerOptions().position(mark).title(nearby.get(i).get(2)));
+        }
+    }
+
+    public ArrayList<ArrayList<String>> getHawkerLocations() {
+        String line = null;
+        InputStream is = null;
+        ArrayList<ArrayList<String>> big = new ArrayList<ArrayList<String>>();
+        try {
+            is = getResources().openRawResource(R.raw.hawkers);
+            //is = new FileInputStream("C:\\Users\\tycli_000\\AndroidStudioProjects\\TestAndr\\app\\src\\main\\res\\raw\\hawkers
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            boolean nameflag = false;
+            ArrayList<String> smol = new ArrayList<String>();
+            while ((line = br.readLine()) != null) {
+                if(line.contains("<name>") && !line.contains("<name>HAWKERCENTRE")){
+                    smol.add(line.trim().replace("<name>", "").replace("</name>", ""));
+                    nameflag = true;
+                }else if(line.contains("<coordinates>") && nameflag){
+                    String[] tmp = line.trim().split(",");
+                    smol.add(0,tmp[1]);
+                    smol.add(0, tmp[0].split(" ")[1]);
+                    big.add(smol);
+                    smol = new ArrayList<String>();
+                    nameflag = false;
+                }
+            }
+            br.close();
+        }
+        catch(IOException ioe){
+            ioe.printStackTrace();
+        }
+        catch(Exception er){
+            er.printStackTrace();
+        }
+
+        return big;
+    }
+    public ArrayList<ArrayList<String>> getNearbyHawkers(ArrayList<ArrayList<String>> inpt,double lat, double lon){
+        //data is long lat
+        double modval = 0.025;
+        ArrayList<ArrayList<String>> ret = new ArrayList<ArrayList<String>>();
+        for(int i =0;i<inpt.size();i++){
+            //if within bounding box
+            if((!(lon+modval < Double.parseDouble(inpt.get(i).get(0)) ||
+                    lon-modval > Double.parseDouble(inpt.get(i).get(0))) &&
+                    !(lat+modval < Double.parseDouble(inpt.get(i).get(1)) ||
+                            lat-modval > Double.parseDouble(inpt.get(i).get(1))))){
+                ret.add(inpt.get(i));
+            }
+        }
+        return ret;
     }
 }
