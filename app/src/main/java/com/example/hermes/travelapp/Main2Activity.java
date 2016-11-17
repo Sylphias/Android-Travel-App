@@ -1,6 +1,5 @@
 package com.example.hermes.travelapp;
 
-import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -11,11 +10,9 @@ import android.view.View;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
-import supportlib.ExhaustiveSearch;
+import supportlib.SearchUtils;
 import supportlib.Location;
-import supportlib.PathInfo;
 import supportlib.PathsAndCost;
 import supportlib.TravelSQL;
 
@@ -34,9 +31,9 @@ public class Main2Activity extends AppCompatActivity {
         test_location.add(2);
         test_location.add(3);
         test_location.add(5);
-        HashMap<Integer,Location> lol  = ExhaustiveSearch.getRawData(test_location,this.getApplicationContext());
+        HashMap<Integer,Location> lol  = SearchUtils.getRawData(test_location,this.getApplicationContext());
 
-        PathsAndCost rawr = ExhaustiveSearch.getBestPath((ArrayList)ExhaustiveSearch.generateAllPaths(test_location),100,lol);
+        PathsAndCost rawr = SearchUtils.getBestPath((ArrayList) SearchUtils.generateAllPaths(test_location),100,lol);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
