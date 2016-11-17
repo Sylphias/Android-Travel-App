@@ -1,5 +1,6 @@
 package supportlib;
 
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -120,10 +121,9 @@ public class TravelSQL extends SQLiteOpenHelper {
 
     /*
         Return a Location object.
-        Takes a String detailing location.
-        PS: not doing any checks - Assumes First Letter Caps, and direct match to location.
      */
     public Location getEntryFrom(String s){
+        //not doing any checks - Assumes First Letter Caps, and direct match to location.
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res = db.rawQuery("select * from sqlitetable where location="+s,null);
         Location ret = new Location(
