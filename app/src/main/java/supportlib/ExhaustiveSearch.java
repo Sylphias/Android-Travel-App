@@ -153,7 +153,7 @@ public class ExhaustiveSearch{
      * Returns location ID of the vertex it is connected to and the timecost average of that edge to the vertex
      *
      **/
-    public static HashMap<Integer,Double> getConnected(int locationId, HashMap<Integer,Location> Locations){
+    public static HashMap<Integer,PathInfo> getConnected(int locationId, HashMap<Integer,Location> Locations){
         HashMap<Integer,PathInfo> res = new HashMap<>();
         for (int i = 0; i < Locations.size();i++){
             if (Locations.get(i).id == locationId)
@@ -167,7 +167,8 @@ public class ExhaustiveSearch{
                 double costFoot = 0;
                 double costPriv = Locations.get(locationId).getPrivatecost()[i];
                 double secondArg = (map(timePub,0,300,0,10) + map(costPub,0,25,0,10) + map(timePriv,0,300,0,10) + map(costPriv,0,25,0,10) + map(timeFoot,0,300,0,10) + map(costFoot,0,25,0,10))/3;
-                res.put(Locations.get(i).id,secondArg);
+                //res.put(Locations.get(i).id,secondArg);
+
             }
         }
         return res;

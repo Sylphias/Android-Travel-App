@@ -1,5 +1,7 @@
 package supportlib;
 
+import com.example.hermes.travelapp.R;
+
 import java.util.Arrays;
 
 /**
@@ -13,6 +15,7 @@ public class Location {
     private float[] privatecost;
     private int[] privatetime;
     private int[] foottime;
+    private int image;
 
     public int getId() {
         return id;
@@ -70,9 +73,18 @@ public class Location {
         this.foottime = foottime;
     }
 
-    public Location(String id, String location, String pc, String pt, String pvc, String pvt, String ft){
+    public int getImage() {
+        return image;
+    }
+
+    public void setImage(int image) {
+        this.image = image;
+    }
+
+    public Location(String id, String location, String pc, String pt, String pvc, String pvt, String ft, int image){
         this.id = Integer.parseInt(id)-1; //id starts from 1 in sqlite
         this.location = location;
+        this.image = image;
 
         //publiccost = Arrays.stream(pc.split(",")).map(String::trim).mapToInt(Integer::parseInt).toArray(); //API 24 :(
         String[] pca = pc.split(",");

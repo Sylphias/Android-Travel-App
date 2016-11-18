@@ -1,12 +1,23 @@
 package com.example.hermes.travelapp;
 
 import android.animation.ValueAnimator;
+import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.text.Layout;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -18,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     static int initial = 0;
     static ArrayList<RelativeLayout> screens = new ArrayList<RelativeLayout>();
     RelativeLayout screen1, screen2, screen3;
+    ArrayList<Integer> selectedLoc = new ArrayList<Integer>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         screen1 = (RelativeLayout) findViewById(R.id.content_main);
         screen2 = (RelativeLayout) findViewById(R.id.budget);
         screen3 = (RelativeLayout) findViewById(R.id.destinations);
+        screen1.setVisibility(View.VISIBLE);
         screen2.setX(2000);
         screen2.setVisibility(View.VISIBLE);
         screen3.setX(2000);
@@ -35,8 +48,21 @@ public class MainActivity extends AppCompatActivity {
         screens.add(screen2);
         screens.add(screen3);
         initial = 0;
+
         //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
+
+        GridView gridview = (GridView) findViewById(R.id.gridview);
+        gridview.setAdapter(new ImageAdapter(this));
+
+        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v,
+                                    int position, long id) {
+                if(! selectedLoc.contains(position)) selectedLoc.add(position);
+                //Toast.makeText(MainActivity.this, "" + position,
+                        //Toast.LENGTH_SHORT).show();
+            }
+        });
 
     }
 
@@ -44,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         super.onWindowFocusChanged(hasFocus);
 
         posAnimScreenOutLeft = ValueAnimator.ofFloat(0, -1 * screen1.getWidth());
-        posAnimScreenOutLeft.setDuration(1000);
+        posAnimScreenOutLeft.setDuration(750);
         posAnimScreenOutLeft.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -53,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         opAnimScreenOutLeft = ValueAnimator.ofFloat(1, 0);
-        opAnimScreenOutLeft.setDuration(1000);
+        opAnimScreenOutLeft.setDuration(750);
         opAnimScreenOutLeft.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -63,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         posAnimScreenOutRight = ValueAnimator.ofFloat(0, screen1.getWidth());
-        posAnimScreenOutRight.setDuration(1000);
+        posAnimScreenOutRight.setDuration(750);
         posAnimScreenOutRight.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -72,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         opAnimScreenOutRight = ValueAnimator.ofFloat(1, 0);
-        opAnimScreenOutRight.setDuration(1000);
+        opAnimScreenOutRight.setDuration(750);
         opAnimScreenOutRight.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -82,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         posAnimScreenInLeft = ValueAnimator.ofFloat(-1 * screen1.getWidth(), 0);
-        posAnimScreenInLeft.setDuration(1000);
+        posAnimScreenInLeft.setDuration(750);
         posAnimScreenInLeft.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -91,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         opAnimScreenInLeft = ValueAnimator.ofFloat(0, 1);
-        opAnimScreenInLeft.setDuration(1000);
+        opAnimScreenInLeft.setDuration(750);
         opAnimScreenInLeft.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -101,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         posAnimScreenInRight = ValueAnimator.ofFloat(screen1.getWidth(),0);
-        posAnimScreenInRight.setDuration(1000);
+        posAnimScreenInRight.setDuration(750);
         posAnimScreenInRight.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -110,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         opAnimScreenInRight = ValueAnimator.ofFloat(0, 1);
-        opAnimScreenInRight.setDuration(1000);
+        opAnimScreenInRight.setDuration(750);
         opAnimScreenInRight.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -212,21 +238,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void budget(View v){
-        animScreen = currScreen;
-        posAnimScreenOutLeft.start();
-        opAnimScreenOutLeft.start();
-        posAnimScreenInRight.start();
-        opAnimScreenInRight.start();
-        currScreen = 2;
+        if (currScreen == 1) {
+            animScreen = currScreen;
+            posAnimScreenOutLeft.start();
+            opAnimScreenOutLeft.start();
+            posAnimScreenInRight.start();
+            opAnimScreenInRight.start();
+            currScreen = 2;
+        }
     }
 
     public void submitBudget(View v){
-        animScreen = currScreen;
-        posAnimScreenOutLeft.start();
-        opAnimScreenOutLeft.start();
-        posAnimScreenInRight.start();
-        opAnimScreenInRight.start();
-        currScreen = 3;
+        if (currScreen == 2) {
+            animScreen = currScreen;
+            posAnimScreenOutLeft.start();
+            opAnimScreenOutLeft.start();
+            posAnimScreenInRight.start();
+            opAnimScreenInRight.start();
+            currScreen = 3;
+        }
     }
 
     public void onBackPressed() {
@@ -242,3 +272,4 @@ public class MainActivity extends AppCompatActivity {
     }
 
 }
+
