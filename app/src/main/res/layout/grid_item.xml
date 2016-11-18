@@ -4,12 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.example.hermes.travelapp.SquareImageView
-        android:id="@+id/picture"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"/>
-
     <TextView
         android:id="@+id/text"
         android:layout_width="match_parent"
@@ -21,5 +15,11 @@
         android:layout_gravity="bottom"
         android:textColor="@android:color/white"
         android:background="#55000000"/>
+
+    <com.example.hermes.travelapp.SquareImageView
+        android:id="@+id/picture"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"/>
 
 </FrameLayout>
