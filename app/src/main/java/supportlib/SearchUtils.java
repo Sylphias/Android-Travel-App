@@ -35,7 +35,7 @@ public class SearchUtils {
         for(int i = 0; i < locations.size();i++){
             rawdata.put(locations.get(i),new TravelSQL(context).getEntryFrom(locations.get(i)));
         }
-        rawdata.put(1,new TravelSQL(context).getEntryFrom(1));
+        rawdata.put(0,new TravelSQL(context).getEntryFrom(0));
         return rawdata;
     }
 
@@ -68,8 +68,8 @@ public class SearchUtils {
         ArrayList<PathInfo> bestPath = new ArrayList<>();
         double bestCost = 0;
         for (int i = 0; i < paths.size(); i++) {
-            paths.get(i).add(0,1);
-            paths.get(i).add(paths.get(i).size(),1);
+            paths.get(i).add(0,0);
+            paths.get(i).add(paths.get(i).size(),0);
             double currentTimeCost = getPathTimeCost(paths.get(i),rawdata);
             PathsAndCost pnc = getPathCost(paths.get(i),rawdata);
             double currentCost = pnc.getCost();
@@ -161,7 +161,14 @@ public class SearchUtils {
 
         for (int toLocation : locations.keySet()) {
             if (toLocation != locationId) {
-                res.add(new PathInfo(locations.get(toLocation).getLocation(), locations.get(locationId).getLocation(), toLocation, locationId, locations.get(locationId).getPrivatetime()[toLocation],locations.get(locationId).getPrivatecost()[toLocation], TRANSPORTATION.TAXI));
+                double privateCost , publicCost, privateDuration, publicDuration, publicRatio, privateRatio;
+                publicCost = locations.get(locationId).getPubliccost()[toLocation];
+                privateCost = locations.get(locationId).getPubliccost()[toLocation];
+                publicCost = locations.get(locationId).getPubliccost()[toLocation];
+                publicCost = locations.get(locationId).getPubliccost()[toLocation];
+                res.add(new PathInfo(locations.get(toLocation).getLocation(), locations.get(locationId).getLocation(),
+                        toLocation, locationId, locations.get(locationId).getPrivatetime()[toLocation],
+                        locations.get(locationId).getPrivatecost()[toLocation], TRANSPORTATION.TAXI));
             }
         }
         return res;

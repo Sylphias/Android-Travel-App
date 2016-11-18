@@ -10,7 +10,9 @@ import android.view.View;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
+import supportlib.NearestNeighbour;
 import supportlib.SearchUtils;
 import supportlib.Location;
 import supportlib.PathsAndCost;
@@ -31,10 +33,11 @@ public class Main2Activity extends AppCompatActivity {
         test_location.add(2);
         test_location.add(3);
         test_location.add(5);
+        List<Location> meme =  tsql.getAllEntries();
         HashMap<Integer,Location> lol  = SearchUtils.getRawData(test_location,this.getApplicationContext());
-
-        PathsAndCost rawr = SearchUtils.getBestPath((ArrayList) SearchUtils.generateAllPaths(test_location),100,lol);
-
+        PathsAndCost rawr = SearchUtils.getBestPath((ArrayList) SearchUtils.generateAllPaths(test_location),30,lol);
+        PathsAndCost rawr2 = NearestNeighbour.getApproximatedPath(lol,50);
+        //ArrayList<PathInfo> paths,double cost, double budget, HashMap<Integer,Location> locations
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
