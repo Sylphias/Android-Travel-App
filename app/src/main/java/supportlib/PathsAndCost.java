@@ -9,7 +9,9 @@ import java.util.ArrayList;
 public class PathsAndCost {
     ArrayList<PathInfo> path;
     double cost;
-
+    public PathsAndCost(){
+        super();
+    }
     public PathsAndCost(ArrayList<PathInfo> path, double cost) {
         this.path = path;
         this.cost = cost;

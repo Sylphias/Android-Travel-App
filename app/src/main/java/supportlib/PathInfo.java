@@ -6,7 +6,7 @@ package supportlib;
 
 public class PathInfo {
     String to, from;
-    int toId, fromId;
+    int toId, fromId,duration;
     double cost;
     TRANSPORTATION mode;
 
@@ -16,6 +16,25 @@ public class PathInfo {
         this.toId = toId;
         this.fromId = fromId;
         this.cost = cost;
+        this.mode = mode;
+    }
+
+    public PathInfo(String to, String from, int toId, int fromId, int duration, double cost, TRANSPORTATION mode) {
+        this.to = to;
+        this.from = from;
+        this.toId = toId;
+        this.fromId = fromId;
+        this.duration = duration;
+        this.cost = cost;
+        this.mode = mode;
+    }
+
+    public PathInfo(String to, String from, int toId, int fromId, int duration, TRANSPORTATION mode) {
+        this.to = to;
+        this.from = from;
+        this.toId = toId;
+        this.fromId = fromId;
+        this.duration = duration;
         this.mode = mode;
     }
 
@@ -45,6 +64,14 @@ public class PathInfo {
 
     public int getToId() {
         return toId;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
     }
 
     public void setToId(int toId) {

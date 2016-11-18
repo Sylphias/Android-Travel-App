@@ -1,6 +1,5 @@
 package com.example.hermes.travelapp;
 
-import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -13,9 +12,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import supportlib.ExhaustiveSearch;
+import supportlib.NearestNeighbour;
+import supportlib.SearchUtils;
 import supportlib.Location;
-import supportlib.PathInfo;
 import supportlib.PathsAndCost;
 import supportlib.TravelSQL;
 
@@ -33,11 +32,12 @@ public class Main2Activity extends AppCompatActivity {
         tsql.onCreate(db);
         test_location.add(2);
         test_location.add(3);
-        test_location.add(5);
-        HashMap<Integer,Location> lol  = ExhaustiveSearch.getRawData(test_location,this.getApplicationContext());
-
-        PathsAndCost rawr = ExhaustiveSearch.getBestPath((ArrayList)ExhaustiveSearch.generateAllPaths(test_location),100,lol);
-
+        test_location.add(4);
+        List<Location> meme =  tsql.getAllEntries();
+        HashMap<Integer,Location> lol  = SearchUtils.getRawData(test_location,this.getApplicationContext());
+        PathsAndCost rawr = SearchUtils.getBestPath((ArrayList) SearchUtils.generateAllPaths(test_location),30,lol);
+        PathsAndCost rawr2 = NearestNeighbour.getApproximatedPath(lol,50);
+        //ArrayList<PathInfo> paths,double cost, double budget, HashMap<Integer,Location> locations
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

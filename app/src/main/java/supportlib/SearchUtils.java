@@ -25,7 +25,7 @@ import java.util.Map;
  * Given a list of location IDs, we will return an array list of all possible permutations of that array list
  */
 
-public class ExhaustiveSearch{
+public class SearchUtils {
 
     /**
      * This method takes in a list of locations and returns a lists of all possible permutations of order of location visit.
@@ -35,7 +35,7 @@ public class ExhaustiveSearch{
         for(int i = 0; i < locations.size();i++){
             rawdata.put(locations.get(i),new TravelSQL(context).getEntryFrom(locations.get(i)));
         }
-        rawdata.put(1,new TravelSQL(context).getEntryFrom(1));
+        rawdata.put(0,new TravelSQL(context).getEntryFrom(0));
         return rawdata;
     }
 
@@ -68,8 +68,8 @@ public class ExhaustiveSearch{
         ArrayList<PathInfo> bestPath = new ArrayList<>();
         double bestCost = 0;
         for (int i = 0; i < paths.size(); i++) {
-            paths.get(i).add(0,1);
-            paths.get(i).add(paths.get(i).size(),1);
+            paths.get(i).add(0,0);
+            paths.get(i).add(paths.get(i).size(),0);
             double currentTimeCost = getPathTimeCost(paths.get(i),rawdata);
             PathsAndCost pnc = getPathCost(paths.get(i),rawdata);
             double currentCost = pnc.getCost();
@@ -131,14 +131,18 @@ public class ExhaustiveSearch{
                 case 0:
                     cost = cost + rawdata.get(fromLoc).getPubliccost()[toLoc];
                     pi.setCost(rawdata.get(fromLoc).getPubliccost()[toLoc]);
+                    pi.setDuration(rawdata.get(fromLoc).getPublictime()[toLoc]);
                     pi.setMode(TRANSPORTATION.BUS);
                     break;
-                case 1: cost = cost + rawdata.get(fromLoc).getPrivatecost()[toLoc];
+                case 1:
+                    cost = cost + rawdata.get(fromLoc).getPrivatecost()[toLoc];
                     pi.setCost(rawdata.get(fromLoc).getPrivatecost()[toLoc]);
+                    pi.setDuration(rawdata.get(fromLoc).getPrivatetime()[toLoc]);
                     pi.setMode(TRANSPORTATION.TAXI);
                     break;
                 case 2:
                     pi.setCost(0);
+                    pi.setDuration(rawdata.get(fromLoc).getFoottime()[toLoc]);
                     pi.setMode(TRANSPORTATION.WALKING);
                     break;
             }
@@ -150,30 +154,47 @@ public class ExhaustiveSearch{
     }
 
     /**
-     * Returns location ID of the vertex it is connected to and the timecost average of that edge to the vertex
-     *
+     * This method returns an array list of Paths for comparison to be done for nearest neighbour
      **/
-    public static HashMap<Integer,PathInfo> getConnected(int locationId, HashMap<Integer,Location> Locations){
-        HashMap<Integer,PathInfo> res = new HashMap<>();
-        for (int i = 0; i < Locations.size();i++){
-            if (Locations.get(i).id == locationId)
-                continue;
-            else
-            {
-                double timePub = Locations.get(locationId).getPublictime()[i];
-                double timeFoot = Locations.get(locationId).getFoottime()[i];
-                double timePriv = Locations.get(locationId).getPrivatetime()[i];
-                double costPub = Locations.get(locationId).getPubliccost()[i];
-                double costFoot = 0;
-                double costPriv = Locations.get(locationId).getPrivatecost()[i];
-                double secondArg = (map(timePub,0,300,0,10) + map(costPub,0,25,0,10) + map(timePriv,0,300,0,10) + map(costPriv,0,25,0,10) + map(timeFoot,0,300,0,10) + map(costFoot,0,25,0,10))/3;
-                //res.put(Locations.get(i).id,secondArg);
 
+    public static ArrayList<PathInfo> getConnected(int locationId, HashMap<Integer,Location> locations){
+        ArrayList<PathInfo> res = new ArrayList<>();
+
+        for (int toLocation : locations.keySet()) {
+            if (toLocation != locationId) {
+                double privateCost , publicCost, privateDuration, publicDuration, publicRatio, privateRatio;
+                publicCost = locations.get(locationId).getPubliccost()[toLocation];
+                privateCost = locations.get(locationId).getPubliccost()[toLocation];
+                publicCost = locations.get(locationId).getPubliccost()[toLocation];
+                publicCost = locations.get(locationId).getPubliccost()[toLocation];
+                res.add(new PathInfo(locations.get(toLocation).getLocation(), locations.get(locationId).getLocation(),
+                        toLocation, locationId, locations.get(locationId).getPrivatetime()[toLocation],
+                        locations.get(locationId).getPrivatecost()[toLocation], TRANSPORTATION.TAXI));
             }
         }
         return res;
     }
 
+    public static PathInfo getVehicleConnection(PathInfo pi , HashMap<Integer,Location> locations){
+        switch(pi.getMode()) {
+            case TAXI:
+                pi.setDuration(locations.get(pi.getFromId()).getPublictime()[pi.getToId()]);
+                pi.setCost(locations.get(pi.getFromId()).getPubliccost()[pi.getToId()]);
+                pi.setMode(TRANSPORTATION.BUS);
+                break;
+            case BUS:
+                pi.setDuration(locations.get(pi.getFromId()).getFoottime()[pi.getToId()]);
+                pi.setCost(0);
+                pi.setMode(TRANSPORTATION.WALKING);
+                break;
+        }
+    return pi;
+
+    }
+
+    /**
+    * This method is used to calculate the timecost of each edge,
+    ***/
     public static double map(double x, double in_min, double in_max, double out_min, double out_max)
     {
         return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
