@@ -32,7 +32,7 @@ public class Main2Activity extends AppCompatActivity {
         tsql.onCreate(db);
         test_location.add(2);
         test_location.add(3);
-        test_location.add(5);
+        test_location.add(4);
         List<Location> meme =  tsql.getAllEntries();
         HashMap<Integer,Location> lol  = SearchUtils.getRawData(test_location,this.getApplicationContext());
         PathsAndCost rawr = SearchUtils.getBestPath((ArrayList) SearchUtils.generateAllPaths(test_location),30,lol);

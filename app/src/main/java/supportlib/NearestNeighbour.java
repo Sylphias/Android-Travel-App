@@ -29,22 +29,17 @@ public class NearestNeighbour {
         double cost = nextPath.getCost();
         visited.add(nextPath);
 
-        while(visited.size() < originalSize-1){
-            originalLocation.put(current_location_id,locations.get(current_location_id));
+        while(visited.size() < originalSize){
             locations.remove(current_location_id);
             current_location_id = nextPath.getToId();
-            nextPath = getNextLocation(SearchUtils.getConnected(current_location_id,locations));
+            originalLocation.put(current_location_id,locations.get(current_location_id));
+            if(visited.size() == originalSize-1)
+                locations.put(0,originalLocation.get(0));
+            nextPath = getNextLocation(SearchUtils.getConnected(current_location_id, locations));
             cost += nextPath.getCost();
             visited.add(nextPath);
-        }
 
-        // Finally route back to the hotel.
-        originalLocation.put(current_location_id,locations.get(current_location_id));
-        locations.put(0,originalLocation.get(0));
-        current_location_id = nextPath.getToId();
-        nextPath = getNextLocation(SearchUtils.getConnected(current_location_id,locations));
-        cost += nextPath.getCost();
-        visited.add(nextPath);
+        }
         PathsAndCost pnc = relaxPathInfo(visited,cost, budget, originalLocation);
 
         return pnc;
@@ -54,6 +49,7 @@ public class NearestNeighbour {
     *  Following the principle of dijkstra, this method will loop through the
     **/
     public static PathsAndCost relaxPathInfo(ArrayList<PathInfo> paths,double cost, double budget, HashMap<Integer,Location> locations){
+        HashMap<Integer,Location> blah = locations;
         ArrayList<PathInfo> relaxedPath = paths;
         if(cost> budget) {
             for (int i = 0; i < 2; i++) {
