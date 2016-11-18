@@ -156,6 +156,7 @@ public class SearchUtils {
     /**
      * This method returns an array list of Paths for comparison to be done for nearest neighbour
      **/
+
     public static ArrayList<PathInfo> getConnected(int locationId, HashMap<Integer,Location> locations){
         ArrayList<PathInfo> res = new ArrayList<>();
 
