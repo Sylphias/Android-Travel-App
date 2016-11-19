@@ -21,6 +21,12 @@
         android:visibility="invisible" />
 
     <include layout="@layout/budget"
-        android:visibility="visible" />
+        android:visibility="invisible" />
+
+    <include layout="@layout/maps"
+        android:visibility="invisible" />
+
+    <include layout="@layout/activity_itinerary"
+        android:visibility="invisible" />
 
 </android.support.design.widget.CoordinatorLayout>

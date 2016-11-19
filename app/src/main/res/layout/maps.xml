@@ -1,0 +1,83 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:id="@+id/maps">
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:map="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.example.reganandela.testandr.MapsActivity"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/mapSubmitBtn" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nearby Places"
+        android:id="@+id/mapNearbyButton"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/mapsEdittext"
+        android:layout_alignLeft="@+id/mapSubmitBtn"
+        android:layout_alignStart="@+id/mapSubmitBtn" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Search"
+        android:id="@+id/mapSubmitBtn"
+        android:layout_below="@+id/mapNearbyButton"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/mapsEdittext"
+        android:maxLines="1"
+        android:hint="Enter Location..."
+        android:inputType="text"
+        android:imeOptions="actionSend"
+        android:textColor="@android:color/background_light"
+        android:textColorHint="@android:color/background_light"
+        android:layout_alignBaseline="@+id/mapSubmitBtn"
+        android:layout_alignBottom="@+id/mapSubmitBtn"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@+id/mapSubmitBtn"
+        android:layout_toStartOf="@+id/mapSubmitBtn" />
+
+    <Button
+        android:text="Satellite View"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/roadmap"
+        android:layout_toEndOf="@+id/roadmap"
+        android:id="@+id/satellite"
+        android:onClick="satellite" />
+
+    <Button
+        android:text="roadmap view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/roadmap"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:onClick="roadmap" />
+
+</RelativeLayout>
+
+
