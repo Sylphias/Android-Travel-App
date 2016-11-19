@@ -101,8 +101,16 @@ public class PathInfo {
     public void setMode(TRANSPORTATION mode) {
         this.mode = mode;
     }
+
+    public enum TRANSPORTATION{
+        WALKING, BUS, TAXI;
+    }
+
 }
 
 enum TRANSPORTATION{
     WALKING, BUS, TAXI;
 }
+
+
+
