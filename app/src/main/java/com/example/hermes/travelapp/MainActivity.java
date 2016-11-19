@@ -49,6 +49,8 @@ import supportlib.PathsAndCost;
 import supportlib.SearchUtils;
 import supportlib.PathInfo.TRANSPORTATION;
 
+import static java.lang.Math.round;
+
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     static ValueAnimator posAnim, opAnim, posAnim1, opAnim1, posAnim2, opAnim2, posAnim3, opAnim3, posAnimScreenOutLeft, opAnimScreenOutLeft, posAnimScreenOutRight, opAnimScreenOutRight, posAnimScreenInLeft, opAnimScreenInLeft, posAnimScreenInRight, opAnimScreenInRight;
@@ -122,33 +124,40 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onClick(View view) {
                 HashMap<Integer, Location> lol  = SearchUtils.getRawData(selectedLoc, getApplicationContext());
                 rawr = SearchUtils.getBestPath((ArrayList) SearchUtils.generateAllPaths(selectedLoc),30,lol);
-                rawr2 = NearestNeighbour.getApproximatedPath(lol,50);
+                rawr2 = NearestNeighbour.getApproximatedPath(lol,2);
                 animScreen = 3;
                 nextScreen = 4;
                 animationStart();
                 currScreen = 4;
 
 
-                for (int i = 0; i < rawr.getPath().size();i++){
+                for (int i = 0; i < rawr2.getPath().size();i++){
                     ArrayList<String> xx = new ArrayList<>();
-                    xx.add(rawr.getPath().get(i).getFrom());
+                    xx.add(rawr2.getPath().get(i).getFrom());
                     genElement(xx, 0);
-                    if (rawr.getPath().get(i).getMode() == TRANSPORTATION.TAXI) {
+                    Double cost = rawr2.getPath().get(i).getCost();
+                    cost = round(cost * 100.00)/100.00;
+                    if (rawr2.getPath().get(i).getMode() == TRANSPORTATION.TAXI) {
                         xx = new ArrayList<>();
-                        xx.add(Integer.toString(rawr.getPath().get(i).getDuration()));
+                        xx.add(Integer.toString(rawr2.getPath().get(i).getDuration()));
+                        xx.add("$"+Double.toString(cost));
                         genElement(xx, 2);
                     }
                     else {
                         xx = new ArrayList<>();
-                        xx.add("Take Public Transport");
-                        xx.add(Integer.toString(rawr.getPath().get(i).getDuration()));
+                        if (rawr2.getPath().get(i).getMode() == TRANSPORTATION.BUS)
+                            xx.add("Take Public Transport");
+                        else
+                            xx.add("Take a Walk!");
+                        xx.add(Integer.toString(rawr2.getPath().get(i).getDuration()));
+                        xx.add("$"+Double.toString(cost));
                         genElement(xx,1);
                     }
 
                 }
 
                 ArrayList<String> xx = new ArrayList<>();
-                xx.add(rawr.getPath().get(rawr.getPath().size()-1).getTo());
+                xx.add(rawr2.getPath().get(rawr2.getPath().size()-1).getTo());
                 genElement(xx, 0);
 
 
@@ -534,6 +543,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public void genElement(ArrayList<String> a, int type){
 
+
         LayoutInflater inflater=LayoutInflater.from(this);
         View view;
 
@@ -549,6 +559,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 y.setText(a.get(0));
                 TextView f = (TextView) view.findViewById(R.id.textView4);
                 f.setText(a.get(1));
+                TextView k = (TextView) view.findViewById(R.id.textView5);
+                k.setText(a.get(2));
                 break;
             default:
                 view = inflater.inflate(R.layout.itenerary_travelcab_interactive_item, linearLayout, false);
@@ -556,6 +568,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 z.setText("Take a cab!");
                 TextView b = (TextView) view.findViewById(R.id.textView4);
                 b.setText(a.get(0));
+                TextView m = (TextView) view.findViewById(R.id.textView5);
+                m.setText(a.get(1));
                 break;
         }
 
