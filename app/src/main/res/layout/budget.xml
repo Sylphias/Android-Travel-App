@@ -46,7 +46,7 @@
         android:layout_below="@+id/editText2"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="13dp"
-        android:id="@+id/button"
+        android:id="@+id/submitBudget"
         android:onClick="submitBudget" />
 
 </RelativeLayout>

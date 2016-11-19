@@ -66,8 +66,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleMap mMap;
     private LatLng curr;
 
-    PathsAndCost rawr;
-    PathsAndCost rawr2;
+    PathsAndCost exhaustivePnC;
+    PathsAndCost fastApproxPnC;
 
     ViewGroup linearLayout;
 
@@ -123,34 +123,37 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                HashMap<Integer, Location> lol  = SearchUtils.getRawData(selectedLoc, getApplicationContext());
-                rawr = SearchUtils.getBestPath((ArrayList) SearchUtils.generateAllPaths(selectedLoc),budget,lol);
-                rawr2 = NearestNeighbour.getApproximatedPath(lol,budget);
+                ArrayList<Integer> feedArray = new ArrayList<Integer>();
+                for (int i = 0; i < selectedLoc.size(); i++) feedArray.add(selectedLoc.get(i));
+                HashMap<Integer, Location> lol  = SearchUtils.getRawData(feedArray, getApplicationContext());
+                exhaustivePnC = SearchUtils.getBestPath((ArrayList) SearchUtils.generateAllPaths(feedArray),budget,lol);
+                fastApproxPnC = NearestNeighbour.getApproximatedPath(lol,budget);
                 animScreen = 3;
                 nextScreen = 4;
                 animationStart();
                 currScreen = 4;
 
+                linearLayout.removeAllViews();
 
-                for (int i = 0; i < rawr2.getPath().size();i++){
+                for (int i = 0; i < fastApproxPnC.getPath().size();i++){
                     ArrayList<String> xx = new ArrayList<>();
-                    xx.add(rawr2.getPath().get(i).getFrom());
+                    xx.add(fastApproxPnC.getPath().get(i).getFrom());
                     genElement(xx, 0);
-                    Double cost = rawr2.getPath().get(i).getCost();
+                    Double cost = fastApproxPnC.getPath().get(i).getCost();
                     cost = round(cost * 100.00)/100.00;
-                    if (rawr2.getPath().get(i).getMode() == TRANSPORTATION.TAXI) {
+                    if (fastApproxPnC.getPath().get(i).getMode() == TRANSPORTATION.TAXI) {
                         xx = new ArrayList<>();
-                        xx.add(Integer.toString(rawr2.getPath().get(i).getDuration()));
+                        xx.add(Integer.toString(fastApproxPnC.getPath().get(i).getDuration()));
                         xx.add("$"+Double.toString(cost));
                         genElement(xx, 2);
                     }
                     else {
                         xx = new ArrayList<>();
-                        if (rawr2.getPath().get(i).getMode() == TRANSPORTATION.BUS)
+                        if (fastApproxPnC.getPath().get(i).getMode() == TRANSPORTATION.BUS)
                             xx.add("Take Public Transport");
                         else
                             xx.add("Take a Walk!");
-                        xx.add(Integer.toString(rawr2.getPath().get(i).getDuration()));
+                        xx.add(Integer.toString(fastApproxPnC.getPath().get(i).getDuration()));
                         xx.add("$"+Double.toString(cost));
                         genElement(xx,1);
                     }
@@ -158,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
 
                 ArrayList<String> xx = new ArrayList<>();
-                xx.add(rawr2.getPath().get(rawr2.getPath().size()-1).getTo());
+                xx.add(fastApproxPnC.getPath().get(fastApproxPnC.getPath().size()-1).getTo());
                 genElement(xx, 0);
 
 
@@ -389,6 +392,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         else{
             budget = Double.parseDouble(((EditText) findViewById(R.id.editText2)).getText().toString());
+            selectedLoc.clear();
+            GridView gridview = (GridView) findViewById(R.id.gridview);
+            for (int i = 0; i < gridview.getCount(); i++){
+                gridview.getChildAt(i).findViewById(R.id.imageView2).setVisibility(View.INVISIBLE);
+            }
             hideKeyboard(MainActivity.this);
             animScreen = 2;
             nextScreen = 3;
