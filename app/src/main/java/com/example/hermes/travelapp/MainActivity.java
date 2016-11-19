@@ -109,11 +109,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     int position, long id) {
                 if(! selectedLoc.contains(position)){
                     selectedLoc.add(position);
-                    gridview.getChildAt(position).findViewById(R.id.imageView2).setVisibility(View.VISIBLE);
+                    gridview.getChildAt(position).findViewById(R.id.imageViewTick).setVisibility(View.VISIBLE);
                 }
                 else{
                     selectedLoc.remove(selectedLoc.indexOf(position));
-                    gridview.getChildAt(position).findViewById(R.id.imageView2).setVisibility(View.INVISIBLE);
+                    gridview.getChildAt(position).findViewById(R.id.imageViewTick).setVisibility(View.INVISIBLE);
                 }
             }
         });
@@ -395,7 +395,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             selectedLoc.clear();
             GridView gridview = (GridView) findViewById(R.id.gridview);
             for (int i = 0; i < gridview.getCount(); i++){
-                gridview.getChildAt(i).findViewById(R.id.imageView2).setVisibility(View.INVISIBLE);
+                gridview.getChildAt(i).findViewById(R.id.imageViewTick).setVisibility(View.INVISIBLE);
             }
             hideKeyboard(MainActivity.this);
             animScreen = 2;
