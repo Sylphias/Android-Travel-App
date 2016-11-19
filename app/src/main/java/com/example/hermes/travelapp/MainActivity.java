@@ -131,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 animationStart();
                 currScreen = 4;
 
+                linearLayout.removeAllViews();
 
                 for (int i = 0; i < rawr2.getPath().size();i++){
                     ArrayList<String> xx = new ArrayList<>();
