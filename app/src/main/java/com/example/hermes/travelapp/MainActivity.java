@@ -47,6 +47,7 @@ import supportlib.Location;
 import supportlib.NearestNeighbour;
 import supportlib.PathsAndCost;
 import supportlib.SearchUtils;
+import supportlib.PathInfo.TRANSPORTATION;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -61,6 +62,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private GoogleMap mMap;
     private LatLng curr;
+
+    PathsAndCost rawr;
+    PathsAndCost rawr2;
 
     ViewGroup linearLayout;
 
@@ -112,16 +116,42 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab2);
+        linearLayout = (ViewGroup) findViewById(R.id.scroller);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 HashMap<Integer, Location> lol  = SearchUtils.getRawData(selectedLoc, getApplicationContext());
-                PathsAndCost rawr = SearchUtils.getBestPath((ArrayList) SearchUtils.generateAllPaths(selectedLoc),30,lol);
-                PathsAndCost rawr2 = NearestNeighbour.getApproximatedPath(lol,50);
+                rawr = SearchUtils.getBestPath((ArrayList) SearchUtils.generateAllPaths(selectedLoc),30,lol);
+                rawr2 = NearestNeighbour.getApproximatedPath(lol,50);
                 animScreen = 3;
                 nextScreen = 4;
                 animationStart();
                 currScreen = 4;
+
+
+                for (int i = 0; i < rawr.getPath().size();i++){
+                    ArrayList<String> xx = new ArrayList<>();
+                    xx.add(rawr.getPath().get(i).getFrom());
+                    genElement(xx, 0);
+                    if (rawr.getPath().get(i).getMode() == TRANSPORTATION.TAXI) {
+                        xx = new ArrayList<>();
+                        xx.add(Integer.toString(rawr.getPath().get(i).getDuration()));
+                        genElement(xx, 2);
+                    }
+                    else {
+                        xx = new ArrayList<>();
+                        xx.add("Take Public Transport");
+                        xx.add(Integer.toString(rawr.getPath().get(i).getDuration()));
+                        genElement(xx,1);
+                    }
+
+                }
+
+                ArrayList<String> xx = new ArrayList<>();
+                xx.add(rawr.getPath().get(rawr.getPath().size()-1).getTo());
+                genElement(xx, 0);
+
+
             }
         });
 
@@ -148,18 +178,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         ArrayList<ArrayList<String>> b = new ArrayList<>();
         ArrayList<String> a = new ArrayList<>();
 
-        a.add("Marina Bay Sands");
-        b.add(a);
-        a = new ArrayList<>();
-        a.add("Take Public Transport");
-        a.add("30 minutes");
-        b.add(a);
-        a = new ArrayList<>();
-        a.add("ResortWorld Sentosa");
-        b.add(a);
 
 
-        linearLayout = (ViewGroup) findViewById(R.id.scroller);
+
 
         //call genElement here for each destination and travel method
         //format: genElement( ArrayList of string , identifierCode)
@@ -171,10 +192,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //case 2: display clickable private transport which opens uber app with time
         //string contains at position 0: time taken
 
-
-        genElement(b.get(0),0);
-        genElement(b.get(1),1);
-        genElement(b.get(2),0);
     }
 
     public void onWindowFocusChanged(boolean hasFocus) {
