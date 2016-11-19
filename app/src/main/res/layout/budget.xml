@@ -40,7 +40,7 @@
         android:textColorHint="@android:color/background_light" />
 
     <Button
-        android:text="Go!"
+        android:text="Select Destinations >"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/editText2"

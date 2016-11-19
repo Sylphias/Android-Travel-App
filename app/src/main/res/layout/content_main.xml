@@ -42,7 +42,7 @@
         android:alpha="0" />
 
     <Button
-        android:text="Settings"
+        android:text="Places of Interest"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/settings"
@@ -52,7 +52,8 @@
         android:textColor="@android:color/white"
         android:layout_below="@+id/checkItinerary"
         android:layout_centerHorizontal="true"
-        android:alpha="0" />
+        android:alpha="0"
+        android:onClick="maps" />
 
     <TextView
         android:text="What would you\nlike to do?"
