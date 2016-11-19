@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     static ArrayList<RelativeLayout> screens = new ArrayList<RelativeLayout>();
     RelativeLayout screen1, screen2, screen3, screen4, screen5, screen6;
     ArrayList<Integer> selectedLoc = new ArrayList<Integer>();
+    static double budget = 0;
 
     private GoogleMap mMap;
     private LatLng curr;
@@ -123,8 +124,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View view) {
                 HashMap<Integer, Location> lol  = SearchUtils.getRawData(selectedLoc, getApplicationContext());
-                rawr = SearchUtils.getBestPath((ArrayList) SearchUtils.generateAllPaths(selectedLoc),30,lol);
-                rawr2 = NearestNeighbour.getApproximatedPath(lol,2);
+                rawr = SearchUtils.getBestPath((ArrayList) SearchUtils.generateAllPaths(selectedLoc),budget,lol);
+                rawr2 = NearestNeighbour.getApproximatedPath(lol,budget);
                 animScreen = 3;
                 nextScreen = 4;
                 animationStart();
@@ -382,10 +383,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void submitBudget(View v){
-        animScreen = 2;
-        nextScreen = 3;
-        animationStart();
-        currScreen = 3;
+        if ((((EditText) findViewById(R.id.editText2)).getText().toString()).equals("")){
+                    Toast toast = Toast.makeText(this,"Invalid entry!", Toast.LENGTH_SHORT);
+                    toast.show();
+        }
+        else{
+            budget = Double.parseDouble(((EditText) findViewById(R.id.editText2)).getText().toString());
+            hideKeyboard(MainActivity.this);
+            animScreen = 2;
+            nextScreen = 3;
+            animationStart();
+            currScreen = 3;
+        }
+
     }
 
     public void maps(View v){
