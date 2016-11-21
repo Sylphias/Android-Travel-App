@@ -31,7 +31,6 @@ class ImageAdapter extends BaseAdapter {
         locations = tsql.getAllEntries();
 
         mInflater = LayoutInflater.from(context);
-
         for (int i = 0; i < locations.size(); i++) {
             mItems.add(new Item(locations.get(i).getLocation(), locations.get(i).getImage()));
         }
