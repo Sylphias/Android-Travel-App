@@ -26,6 +26,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -85,6 +86,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         screen4 = (RelativeLayout) findViewById(R.id.destinations);
         screen5 = (RelativeLayout) findViewById(R.id.activity_itinerary);
         screen6 = (RelativeLayout) findViewById(R.id.maps);
+        screen7 = (RelativeLayout) findViewById(R.id.itinerary_list);
+        screen8 = (RelativeLayout) findViewById(R.id.activity_itinerary);
         screen1.setVisibility(View.VISIBLE);
         screen2.setX(2000);
         screen2.setVisibility(View.VISIBLE);
@@ -96,6 +99,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         screen5.setVisibility(View.VISIBLE);
         screen6.setX(2000);
         screen6.setVisibility(View.VISIBLE);
+        screen7.setX(2000);
+        screen7.setVisibility(View.VISIBLE);
         screens.add(null);
         screens.add(screen1);
         screens.add(screen2);
@@ -110,6 +115,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         final GridView hotelsview = (GridView) findViewById(R.id.hotelsview);
         hotelsview.setAdapter(new HotelsAdapter(this));
+
+        final ArrayList<PathsAndCost> pncList = new ArrayList<PathsAndCost>();
 
         final GridView gridview = (GridView) findViewById(R.id.gridview);
 
@@ -157,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     for (int i = 0; i < selectedLoc.size(); i++) feedArray.add(selectedLoc.get(i));
                     HashMap<Integer, Location> allLocations  = SearchUtils.getRawData(feedArray, getApplicationContext(), hotel);
                     resultPnC = NearestNeighbour.getApproximatedPath(allLocations,budget,hotel);
-                    generateItinerary();
+                    generateItinerary(resultPnC);
                     animScreen = 4;
                     nextScreen = 5;
                     animationStart();
@@ -209,6 +216,33 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+
+        final ListView itineraryList = (ListView) findViewById(R.id.itineraryList);
+        final Button checkItinerary = (Button) findViewById(R.id.checkItinerary);
+        checkItinerary.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                ItineraryStoreSQL isql = new ItineraryStoreSQL(getApplicationContext());
+                SQLiteDatabase db = isql.getWritableDatabase();
+                pncList = isql.getAllItineraries();
+                itineraryList.setAdapter(new ListAdapter(MainActivity.this, pncList));
+                animScreen = 1;
+                nextScreen = 7;
+                animationStart();
+                currScreen = 7;
+            }
+        });
+
+        itineraryList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v,
+                                    int position, long id) {
+                resultPnC = pncList.get(position);
+                generateItinerary(resultPnC);
+                animScreen = 7;
+                nextScreen = 8;
+                animationStart();
+                currScreen = 8;
+            }
+        });
 
         //call genElement here for each destination and travel method
         //format: genElement( ArrayList of string , identifierCode)
@@ -538,7 +572,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public void onBackPressed() {
         if (currScreen == 1) super.onBackPressed();
-        else if (currScreen == 6){
+        else if (currScreen == 6 || currScreen == 7){
             animScreen = currScreen;
             nextScreen = 1;
             posAnimScreenOutRight.start();

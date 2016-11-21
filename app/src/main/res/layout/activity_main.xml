@@ -32,4 +32,8 @@
     <include layout="@layout/activity_itinerary"
         android:visibility="invisible" />
 
+    <include layout="@layout/itinerary_list"
+        android:visibility="invisible"
+        android:id="@+id/itinerary_list" />
+
 </android.support.design.widget.CoordinatorLayout>
