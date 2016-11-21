@@ -56,20 +56,24 @@ class ImageAdapter extends BaseAdapter {
         View v = view;
         ImageView picture;
         TextView name;
+        ImageView tick;
 
         if (v == null) {
             v = mInflater.inflate(R.layout.grid_item, viewGroup, false);
             v.setTag(R.id.picture, v.findViewById(R.id.picture));
             v.setTag(R.id.text, v.findViewById(R.id.text));
+            v.setTag(R.id.imageViewTick, v.findViewById(R.id.imageViewTick));
         }
 
         picture = (ImageView) v.getTag(R.id.picture);
         name = (TextView) v.getTag(R.id.text);
+        tick = (ImageView) v.getTag(R.id.imageViewTick);
 
         Item item = getItem(i);
 
         picture.setImageResource(item.drawableId);
         name.setText(item.name);
+        tick.setImageResource(R.mipmap.tick);
 
         return v;
     }

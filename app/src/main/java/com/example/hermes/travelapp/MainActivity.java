@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     static int initial = 0;
     static int hotel;
     static ArrayList<RelativeLayout> screens = new ArrayList<RelativeLayout>();
-    RelativeLayout screen1, screen2, screen3, screen4, screen5, screen6;
+    RelativeLayout screen1, screen2, screen3, screen4, screen5, screen6, screen7, screen8;
     ArrayList<Integer> selectedLoc = new ArrayList<Integer>();
     static double budget = 0;
 
@@ -117,7 +117,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
                 hotel = (int) hotelsview.getAdapter().getItemId(position);
+                selectedLoc.clear();
                 gridview.setAdapter(new ImageAdapter(MainActivity.this, hotel));
+                for (int i = 0; i < gridview.getChildCount(); i++){
+                    gridview.getChildAt(i - gridview.getFirstVisiblePosition()).findViewById(R.id.imageViewTick).setVisibility(View.INVISIBLE);
+                }
                 animScreen = 3;
                 nextScreen = 4;
                 animationStart();
@@ -130,11 +134,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     int position, long id) {
                 if(! selectedLoc.contains((int) gridview.getAdapter().getItemId(position))){
                     selectedLoc.add((int) gridview.getAdapter().getItemId(position));
-                    gridview.getChildAt(position).findViewById(R.id.imageViewTick).setVisibility(View.VISIBLE);
+                    gridview.getChildAt(position - gridview.getFirstVisiblePosition()).findViewById(R.id.imageViewTick).setVisibility(View.VISIBLE);
                 }
                 else{
                     selectedLoc.remove(selectedLoc.indexOf((int) gridview.getAdapter().getItemId(position)));
-                    gridview.getChildAt(position).findViewById(R.id.imageViewTick).setVisibility(View.INVISIBLE);
+                    gridview.getChildAt(position - gridview.getFirstVisiblePosition()).findViewById(R.id.imageViewTick).setVisibility(View.INVISIBLE);
                 }
             }
         });
@@ -176,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     for (int i = 0; i < selectedLoc.size(); i++) feedArray.add(selectedLoc.get(i));
                     HashMap<Integer, Location> allLocations = SearchUtils.getRawData(feedArray, getApplicationContext(), hotel);
                     resultPnC = SearchUtils.getBestPath((ArrayList) SearchUtils.generateAllPaths(feedArray), budget, allLocations, hotel);
-                    generateItinerary();
+                    generateItinerary(resultPnC);
                     animScreen = 4;
                     nextScreen = 5;
                     animationStart();
@@ -403,11 +407,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         else{
             budget = Double.parseDouble(((EditText) findViewById(R.id.editText2)).getText().toString());
-            selectedLoc.clear();
-            GridView gridview = (GridView) findViewById(R.id.gridview);
-            for (int i = 0; i < gridview.getChildCount(); i++){
-                gridview.getChildAt(i).findViewById(R.id.imageViewTick).setVisibility(View.INVISIBLE);
-            }
             hideKeyboard(MainActivity.this);
             animScreen = 2;
             nextScreen = 3;
@@ -579,7 +578,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    public void generateItinerary(){
+    public void generateItinerary(PathsAndCost resultPnC){
         copy2clip = "M Y   I T I N E R A R Y\n\n";
         linearLayout.removeAllViews();
 
@@ -629,21 +628,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         ClipData clip = ClipData.newPlainText("TravelItineraryAppStuff", copy2clip);
         clipboard.setPrimaryClip(clip);
         Toast.makeText(getApplicationContext(), "Your itinerary has been copied to the clipboard!", Toast.LENGTH_SHORT).show();
-    }
-
-    public static Bitmap textAsBitmap(String text, float textSize, int textColor) {
-        Paint paint = new Paint(ANTI_ALIAS_FLAG);
-        paint.setTextSize(textSize);
-        paint.setColor(textColor);
-        paint.setTextAlign(Paint.Align.LEFT);
-        float baseline = -paint.ascent(); // ascent() is negative
-        int width = (int) (paint.measureText(text) + 0.0f); // round
-        int height = (int) (baseline + paint.descent() + 0.0f);
-        Bitmap image = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-
-        Canvas canvas = new Canvas(image);
-        canvas.drawText(text, 0, baseline, paint);
-        return image;
     }
 
 
