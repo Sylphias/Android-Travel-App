@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     ItineraryStoreSQL isql;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        screens.clear();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         isql = new ItineraryStoreSQL(getApplicationContext());
