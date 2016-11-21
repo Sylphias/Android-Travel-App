@@ -31,12 +31,12 @@ public class SearchUtils {
     /**
      * This method takes in a list of locations and returns a lists of all possible permutations of order of location visit.
      **/
-    public static HashMap<Integer,Location> getRawData(ArrayList<Integer> locations, Context context){
+    public static HashMap<Integer,Location> getRawData(ArrayList<Integer> locations, Context context,int hotelID){
         HashMap<Integer,Location> rawdata = new HashMap<Integer,Location>();
         for(int i = 0; i < locations.size();i++){
             rawdata.put(locations.get(i),new TravelSQL(context).getEntryFrom(locations.get(i)));
         }
-        rawdata.put(0,new TravelSQL(context).getEntryFrom(0));
+        rawdata.put(hotelID,new TravelSQL(context).getEntryFrom(hotelID));
         return rawdata;
     }
 
@@ -65,15 +65,18 @@ public class SearchUtils {
      *
      * Complexity of searching for the best path from the exhaustive method is O(n)
      */
-    public static PathsAndCost getBestPath(ArrayList<ArrayList<Integer>> paths, double budget,HashMap<Integer,Location> rawdata) {
+    public static PathsAndCost getBestPath(ArrayList<ArrayList<Integer>> paths, double budget,HashMap<Integer,Location> rawdata, int hotelID) {
         ArrayList<PathInfo> bestPath = new ArrayList<>();
         double bestCost = 0;
         for (int i = 0; i < paths.size(); i++) {
-            paths.get(i).add(0,0);
-            paths.get(i).add(paths.get(i).size(),0);
+            // Add the hotel to the ends of the permutations.
+            paths.get(i).add(0,hotelID);
+            paths.get(i).add(paths.get(i).size(),hotelID);
+            // Calculate the cost of the total path
             double currentTimeCost = getPathTimeCost(paths.get(i),rawdata);
             PathsAndCost pnc = getPathCost(paths.get(i),rawdata);
             double currentCost = pnc.getCost();
+            // Select the best path, loops through the list once
             if (bestCost < currentTimeCost && budget > currentCost ) {
                 bestCost = currentTimeCost;
                 bestPath = pnc.getPath();
@@ -105,9 +108,10 @@ public class SearchUtils {
         }
         return timecost;
     }
-
+    /**
+     * returns the cost of the entire path.
+     **/
     public static PathsAndCost getPathCost(ArrayList<Integer> path, HashMap<Integer,Location> rawdata){
-
         double time = 0;
         double cost = 0;
         ArrayList<PathInfo> pathList = new ArrayList<PathInfo>();

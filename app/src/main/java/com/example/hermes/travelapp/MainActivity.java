@@ -1,5 +1,6 @@
 package com.example.hermes.travelapp;
 
+import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.ClipData;
@@ -120,6 +121,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     int position, long id) {
                 if(! selectedLoc.contains(position)){
                     selectedLoc.add(position);
+
                     gridview.getChildAt(position).findViewById(R.id.imageViewTick).setVisibility(View.VISIBLE);
                 }
                 else{
