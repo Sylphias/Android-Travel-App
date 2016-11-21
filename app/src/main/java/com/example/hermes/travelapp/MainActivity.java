@@ -394,7 +394,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             budget = Double.parseDouble(((EditText) findViewById(R.id.editText2)).getText().toString());
             selectedLoc.clear();
             GridView gridview = (GridView) findViewById(R.id.gridview);
-            for (int i = 0; i < gridview.getCount(); i++){
+            for (int i = 0; i < gridview.getChildCount(); i++){
                 gridview.getChildAt(i).findViewById(R.id.imageViewTick).setVisibility(View.INVISIBLE);
             }
             hideKeyboard(MainActivity.this);
