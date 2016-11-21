@@ -7,6 +7,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
@@ -54,6 +55,7 @@ import supportlib.NearestNeighbour;
 import supportlib.PathsAndCost;
 import supportlib.SearchUtils;
 import supportlib.PathInfo.TRANSPORTATION;
+import supportlib.TravelSQL;
 
 import static java.lang.Math.round;
 
@@ -106,9 +108,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         screens.add(screen5);
         screens.add(screen6);
         initial = 0;
-
-        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        //setSupportActionBar(toolbar);
+        TravelSQL tsql = new TravelSQL(getApplicationContext());
+        SQLiteDatabase db = tsql.getWritableDatabase();
+        tsql.onUpgrade(db,1,2);
 
         final GridView gridview = (GridView) findViewById(R.id.gridview);
         gridview.setAdapter(new ImageAdapter(this));
