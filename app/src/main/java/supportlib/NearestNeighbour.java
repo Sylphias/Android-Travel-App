@@ -17,14 +17,14 @@ public class NearestNeighbour {
      * This is the approximated path using the nearest neighbour algorithm.
      * In the first pass, we will find the paths using the means of transportation with the best cost per time
     **/
-    public static PathsAndCost getApproximatedPath(HashMap<Integer,Location> locations,double budget){
+    public static PathsAndCost getApproximatedPath(HashMap<Integer,Location> locations,double budget,int hotelID){
         ArrayList<PathInfo> visited = new ArrayList<PathInfo>();
         int current_location_id = 0;
         // First step is to find and iterate through all points in the first node (hotel)
         HashMap<Integer,Location>  originalLocation = new HashMap<Integer, Location>();
-        originalLocation.put(0,locations.get(0));
+        originalLocation.put(hotelID,locations.get(hotelID));
         int originalSize = locations.size();
-        current_location_id = locations.get(0).getId();
+        current_location_id = hotelID;
         PathInfo nextPath = getNextLocation(SearchUtils.getConnected(current_location_id,locations));
         double cost = nextPath.getCost();
         visited.add(nextPath);
@@ -34,7 +34,7 @@ public class NearestNeighbour {
             current_location_id = nextPath.getToId();
             originalLocation.put(current_location_id,locations.get(current_location_id));
             if(visited.size() == originalSize-1)
-                locations.put(0,originalLocation.get(0));
+                locations.put(hotelID,originalLocation.get(hotelID));
             nextPath = getNextLocation(SearchUtils.getConnected(current_location_id, locations));
             cost += nextPath.getCost();
             visited.add(nextPath);

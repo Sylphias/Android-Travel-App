@@ -11,12 +11,12 @@
         android:layout_height="match_parent"
         android:scaleType="centerCrop"/>
 
-    <ImageView
+    <com.example.hermes.travelapp.SquareImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:srcCompat="@mipmap/tick"
         android:id="@+id/imageViewTick"
-        android:visibility="invisible" />
+        android:visibility="invisible"
+        android:scaleType="centerCrop" />
 
     <TextView
         android:id="@+id/text"

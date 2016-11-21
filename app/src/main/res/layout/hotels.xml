@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/hotels"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="0dp"
+    android:paddingLeft="0dp"
+    android:paddingRight="0dp"
+    android:paddingTop="0dp"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.example.hermes.travelapp.MainActivity"
+    tools:showIn="@layout/activity_main">
+
+    <GridView
+        android:id="@+id/hotelsview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:verticalSpacing="0dp"
+        android:horizontalSpacing="0dp"
+        android:stretchMode="columnWidth"
+        android:numColumns="2"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/imageView4" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        app:srcCompat="@mipmap/selecthotel"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/imageView5"
+        android:scaleType="centerCrop"
+        android:layout_height="45dp" />
+
+</RelativeLayout>
