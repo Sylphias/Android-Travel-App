@@ -28,7 +28,7 @@ class HotelsAdapter extends BaseAdapter {
         SQLiteDatabase db = tsql.getWritableDatabase();
         tsql.onCreate(db);
         tsql.onUpgrade(db,0,1);
-        locations = tsql.getAllHotels();
+        locations = tsql.getHotels();
 
         mInflater = LayoutInflater.from(context);
         for (int i = 0; i < locations.size(); i++) {
