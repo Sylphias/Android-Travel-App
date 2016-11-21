@@ -1,6 +1,5 @@
 package com.example.hermes.travelapp;
 
-import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.ClipData;
@@ -9,28 +8,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.text.Layout;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,10 +37,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,6 +50,7 @@ import supportlib.SearchUtils;
 import supportlib.PathInfo.TRANSPORTATION;
 import supportlib.TravelSQL;
 
+import static android.graphics.Paint.ANTI_ALIAS_FLAG;
 import static java.lang.Math.round;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -67,8 +60,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     static int animScreen = 1;
     static int nextScreen;
     static int initial = 0;
+    static int hotel;
     static ArrayList<RelativeLayout> screens = new ArrayList<RelativeLayout>();
-    RelativeLayout screen1, screen2, screen3, screen4, screen5, screen6;
+    RelativeLayout screen1, screen2, screen3, screen4, screen5, screen6, screen7, screen8;
     ArrayList<Integer> selectedLoc = new ArrayList<Integer>();
     static double budget = 0;
 
@@ -77,8 +71,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     String copy2clip;
 
-    PathsAndCost exhaustivePnC;
-    PathsAndCost fastApproxPnC;
+    PathsAndCost resultPnC;
 
     ViewGroup linearLayout;
 
@@ -99,6 +92,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         screen3.setVisibility(View.VISIBLE);
         screen4.setX(2000);
         screen4.setVisibility(View.VISIBLE);
+        screen5.setX(2000);
+        screen5.setVisibility(View.VISIBLE);
         screen6.setX(2000);
         screen6.setVisibility(View.VISIBLE);
         screens.add(null);
@@ -113,83 +108,84 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         SQLiteDatabase db = tsql.getWritableDatabase();
         tsql.onUpgrade(db,1,2);
 
-        final GridView gridview = (GridView) findViewById(R.id.gridview);
-        gridview.setAdapter(new ImageAdapter(this));
+        final GridView hotelsview = (GridView) findViewById(R.id.hotelsview);
+        hotelsview.setAdapter(new HotelsAdapter(this));
 
-        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        final GridView gridview = (GridView) findViewById(R.id.gridview);
+
+        hotelsview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                if(! selectedLoc.contains(position)){
-                    selectedLoc.add(position);
-
-                    gridview.getChildAt(position).findViewById(R.id.imageViewTick).setVisibility(View.VISIBLE);
+                hotel = (int) hotelsview.getAdapter().getItemId(position);
+                selectedLoc.clear();
+                gridview.setAdapter(new ImageAdapter(MainActivity.this, hotel));
+                for (int i = 0; i < gridview.getChildCount(); i++){
+                    gridview.getChildAt(i - gridview.getFirstVisiblePosition()).findViewById(R.id.imageViewTick).setVisibility(View.INVISIBLE);
                 }
-                else{
-                    selectedLoc.remove(selectedLoc.indexOf(position));
-                    gridview.getChildAt(position).findViewById(R.id.imageViewTick).setVisibility(View.INVISIBLE);
-                }
-            }
-        });
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab2);
-        linearLayout = (ViewGroup) findViewById(R.id.scroller);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ArrayList<Integer> feedArray = new ArrayList<Integer>();
-                for (int i = 0; i < selectedLoc.size(); i++) feedArray.add(selectedLoc.get(i));
-                HashMap<Integer, Location> lol  = SearchUtils.getRawData(feedArray, getApplicationContext());
-                exhaustivePnC = SearchUtils.getBestPath((ArrayList) SearchUtils.generateAllPaths(feedArray),budget,lol);
-                fastApproxPnC = NearestNeighbour.getApproximatedPath(lol,budget);
                 animScreen = 3;
                 nextScreen = 4;
                 animationStart();
                 currScreen = 4;
+            }
+        });
 
-                copy2clip = "M Y   I T I N E R A R Y\n\n";
-                linearLayout.removeAllViews();
-
-                for (int i = 0; i < fastApproxPnC.getPath().size();i++){
-                    ArrayList<String> xx = new ArrayList<>();
-                    xx.add(fastApproxPnC.getPath().get(i).getFrom());
-                    genElement(xx, 0);
-                    if(i==0)
-                        copy2clip = copy2clip + "Start from hotel!\n\n";
-                    if(i!=0)
-                        copy2clip = copy2clip + "Destination "+(i)+": "+fastApproxPnC.getPath().get(i).getFrom()+"\n\n";
-                    Double cost = fastApproxPnC.getPath().get(i).getCost();
-                    cost = round(cost * 100.00)/100.00;
-                    if (fastApproxPnC.getPath().get(i).getMode() == TRANSPORTATION.TAXI) {
-                        xx = new ArrayList<>();
-                        xx.add(Integer.toString(fastApproxPnC.getPath().get(i).getDuration()));
-                        xx.add("$"+Double.toString(cost));
-                        copy2clip = copy2clip+"Take a cab for around "+"$"+Double.toString(cost)+" for "+Integer.toString(fastApproxPnC.getPath().get(i).getDuration())+"mins";
-                        genElement(xx, 2);
-                    }
-                    else {
-                        xx = new ArrayList<>();
-                        if (fastApproxPnC.getPath().get(i).getMode() == TRANSPORTATION.BUS) {
-                            xx.add("Take Public Transport");
-                            copy2clip = copy2clip+"Take public transport for around "+"$"+Double.toString(cost)+" for "+Integer.toString(fastApproxPnC.getPath().get(i).getDuration())+"mins";
-                        }
-                        else {
-                            xx.add("Take a Walk!");
-                            copy2clip = copy2clip+"Walk from here for "+Integer.toString(fastApproxPnC.getPath().get(i).getDuration())+"mins";
-                        }
-                        xx.add(Integer.toString(fastApproxPnC.getPath().get(i).getDuration()));
-                        xx.add("$"+Double.toString(cost));
-                        genElement(xx,1);
-                    }
-                    copy2clip = copy2clip + "\n";
-
+        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v,
+                                    int position, long id) {
+                if(! selectedLoc.contains((int) gridview.getAdapter().getItemId(position))){
+                    selectedLoc.add((int) gridview.getAdapter().getItemId(position));
+                    gridview.getChildAt(position - gridview.getFirstVisiblePosition()).findViewById(R.id.imageViewTick).setVisibility(View.VISIBLE);
                 }
+                else{
+                    selectedLoc.remove(selectedLoc.indexOf((int) gridview.getAdapter().getItemId(position)));
+                    gridview.getChildAt(position - gridview.getFirstVisiblePosition()).findViewById(R.id.imageViewTick).setVisibility(View.INVISIBLE);
+                }
+            }
+        });
 
-                ArrayList<String> xx = new ArrayList<>();
-                xx.add(fastApproxPnC.getPath().get(fastApproxPnC.getPath().size()-1).getTo());
-                genElement(xx, 0);
-                copy2clip = copy2clip + "Back at your hotel!\n";
+        FloatingActionButton fastFab = (FloatingActionButton) findViewById(R.id.fastFab);
+        linearLayout = (ViewGroup) findViewById(R.id.scroller);
+        fastFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (selectedLoc.size() == 0){
+                    Toast toast = Toast.makeText(MainActivity.this,"Select at least one location!", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+                else{
+                    ArrayList<Integer> feedArray = new ArrayList<Integer>();
+                    for (int i = 0; i < selectedLoc.size(); i++) feedArray.add(selectedLoc.get(i));
+                    HashMap<Integer, Location> allLocations  = SearchUtils.getRawData(feedArray, getApplicationContext(), hotel);
+                    resultPnC = NearestNeighbour.getApproximatedPath(allLocations,budget,hotel);
+                    generateItinerary();
+                    animScreen = 4;
+                    nextScreen = 5;
+                    animationStart();
+                    currScreen = 5;
+                }
+            }
+        });
 
-
+        FloatingActionButton normalFab = (FloatingActionButton) findViewById(R.id.normalFab);
+        linearLayout = (ViewGroup) findViewById(R.id.scroller);
+        normalFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (selectedLoc.size() == 0){
+                    Toast toast = Toast.makeText(MainActivity.this,"Select at least one location!", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+                else {
+                    ArrayList<Integer> feedArray = new ArrayList<Integer>();
+                    for (int i = 0; i < selectedLoc.size(); i++) feedArray.add(selectedLoc.get(i));
+                    HashMap<Integer, Location> allLocations = SearchUtils.getRawData(feedArray, getApplicationContext(), hotel);
+                    resultPnC = SearchUtils.getBestPath((ArrayList) SearchUtils.generateAllPaths(feedArray), budget, allLocations, hotel);
+                    generateItinerary(resultPnC);
+                    animScreen = 4;
+                    nextScreen = 5;
+                    animationStart();
+                    currScreen = 5;
+                }
             }
         });
 
@@ -411,11 +407,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         else{
             budget = Double.parseDouble(((EditText) findViewById(R.id.editText2)).getText().toString());
-            selectedLoc.clear();
-            GridView gridview = (GridView) findViewById(R.id.gridview);
-            for (int i = 0; i < gridview.getChildCount(); i++){
-                gridview.getChildAt(i).findViewById(R.id.imageViewTick).setVisibility(View.INVISIBLE);
-            }
             hideKeyboard(MainActivity.this);
             animScreen = 2;
             nextScreen = 3;
@@ -587,13 +578,57 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    public void generateItinerary(PathsAndCost resultPnC){
+        copy2clip = "M Y   I T I N E R A R Y\n\n";
+        linearLayout.removeAllViews();
+
+        for (int i = 0; i < resultPnC.getPath().size();i++){
+            ArrayList<String> xx = new ArrayList<>();
+            xx.add(resultPnC.getPath().get(i).getFrom());
+            genElement(xx, 0);
+            if(i==0)
+                copy2clip = copy2clip + "Start from hotel!\n\n";
+            if(i!=0)
+                copy2clip = copy2clip + "Destination "+(i)+": "+resultPnC.getPath().get(i).getFrom()+"\n\n";
+            Double cost = resultPnC.getPath().get(i).getCost();
+            cost = round(cost * 100.00)/100.00;
+            if (resultPnC.getPath().get(i).getMode() == TRANSPORTATION.TAXI) {
+                xx = new ArrayList<>();
+                xx.add(Integer.toString(resultPnC.getPath().get(i).getDuration()));
+                xx.add("$"+Double.toString(cost));
+                copy2clip = copy2clip+"Take a cab for around "+"$"+Double.toString(cost)+" for "+Integer.toString(resultPnC.getPath().get(i).getDuration())+"mins";
+                genElement(xx, 2);
+            }
+            else {
+                xx = new ArrayList<>();
+                if (resultPnC.getPath().get(i).getMode() == TRANSPORTATION.BUS) {
+                    xx.add("Take Public Transport");
+                    copy2clip = copy2clip+"Take public transport for around "+"$"+Double.toString(cost)+" for "+Integer.toString(resultPnC.getPath().get(i).getDuration())+"mins";
+                }
+                else {
+                    xx.add("Take a Walk!");
+                    copy2clip = copy2clip+"Walk from here for "+Integer.toString(resultPnC.getPath().get(i).getDuration())+"mins";
+                }
+                xx.add(Integer.toString(resultPnC.getPath().get(i).getDuration()));
+                xx.add("$"+Double.toString(cost));
+                genElement(xx,1);
+            }
+            copy2clip = copy2clip + "\n";
+
+        }
+
+        ArrayList<String> xx = new ArrayList<>();
+        xx.add(resultPnC.getPath().get(resultPnC.getPath().size()-1).getTo());
+        genElement(xx, 0);
+        copy2clip = copy2clip + "Back at your hotel!\n";
+    }
+
     public void Copy2Clip(View v){
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("TravelItineraryAppStuff", copy2clip);
         clipboard.setPrimaryClip(clip);
         Toast.makeText(getApplicationContext(), "Your itinerary has been copied to the clipboard!", Toast.LENGTH_SHORT).show();
     }
-
 
 
 }

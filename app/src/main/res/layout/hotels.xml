@@ -14,12 +14,23 @@
     tools:showIn="@layout/activity_main">
 
     <GridView
-        android:id="@+id/gridview"
+        android:id="@+id/hotelsview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:verticalSpacing="0dp"
         android:horizontalSpacing="0dp"
         android:stretchMode="columnWidth"
-        android:numColumns="2"/>
+        android:numColumns="2"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/imageView4" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        app:srcCompat="@mipmap/selecthotel"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/imageView5"
+        android:scaleType="centerCrop"
+        android:layout_height="45dp" />
 
 </RelativeLayout>

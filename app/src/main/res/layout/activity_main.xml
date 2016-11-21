@@ -17,8 +17,11 @@
     <include layout="@layout/content_main"
         android:visibility="visible" />
 
+    <include layout="@layout/hotels"
+        android:visibility="invisible" />
+
     <include layout="@layout/destinations"
-        android:visibility="visible" />
+        android:visibility="invisible" />
 
     <include layout="@layout/budget"
         android:visibility="invisible" />

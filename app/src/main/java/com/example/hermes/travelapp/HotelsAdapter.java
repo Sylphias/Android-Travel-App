@@ -18,21 +18,21 @@ import supportlib.TravelSQL;
 
 import static java.lang.Integer.parseInt;
 
-class ImageAdapter extends BaseAdapter {
+class HotelsAdapter extends BaseAdapter {
     private final List<Item> mItems = new ArrayList<Item>();
     private final LayoutInflater mInflater;
     private ArrayList<Location> locations = new ArrayList<Location>();
 
-    public ImageAdapter(Context context, int hotel) {
+    public HotelsAdapter(Context context) {
         TravelSQL tsql = new TravelSQL(context);
         SQLiteDatabase db = tsql.getWritableDatabase();
         tsql.onCreate(db);
         tsql.onUpgrade(db,0,1);
-        locations = tsql.getAllExceptHotel(hotel);
+        locations = tsql.getHotels();
 
         mInflater = LayoutInflater.from(context);
         for (int i = 0; i < locations.size(); i++) {
-            mItems.add(new Item(locations.get(i).getLocation(), locations.get(i).getImage(), locations.get(i).getId()));
+            mItems.add(new HotelsAdapter.Item(locations.get(i).getLocation(), locations.get(i).getImage(), locations.get(i).getId()));
         }
     }
 
@@ -56,24 +56,20 @@ class ImageAdapter extends BaseAdapter {
         View v = view;
         ImageView picture;
         TextView name;
-        ImageView tick;
 
         if (v == null) {
             v = mInflater.inflate(R.layout.grid_item, viewGroup, false);
             v.setTag(R.id.picture, v.findViewById(R.id.picture));
             v.setTag(R.id.text, v.findViewById(R.id.text));
-            v.setTag(R.id.imageViewTick, v.findViewById(R.id.imageViewTick));
         }
 
         picture = (ImageView) v.getTag(R.id.picture);
         name = (TextView) v.getTag(R.id.text);
-        tick = (ImageView) v.getTag(R.id.imageViewTick);
 
         Item item = getItem(i);
 
         picture.setImageResource(item.drawableId);
         name.setText(item.name);
-        tick.setImageResource(R.mipmap.tick);
 
         return v;
     }
