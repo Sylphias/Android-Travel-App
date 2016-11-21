@@ -77,6 +77,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     PathsAndCost resultPnC;
 
+    ArrayList<PathsAndCost> pncList;
+
     ViewGroup linearLayout;
     ItineraryStoreSQL isql;
     @Override
@@ -115,6 +117,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         screens.add(screen4);
         screens.add(screen5);
         screens.add(screen6);
+        screens.add(screen7);
+        screens.add(screen8);
         initial = 0;
         TravelSQL tsql = new TravelSQL(getApplicationContext());
         SQLiteDatabase db = tsql.getWritableDatabase();
@@ -122,8 +126,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         final GridView hotelsview = (GridView) findViewById(R.id.hotelsview);
         hotelsview.setAdapter(new HotelsAdapter(this));
-
-        ArrayList<PathsAndCost> pncList = new ArrayList<PathsAndCost>();
 
         final GridView gridview = (GridView) findViewById(R.id.gridview);
 
@@ -173,6 +175,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     resultPnC = NearestNeighbour.getApproximatedPath(allLocations,budget,hotel);
                     SQLiteDatabase isdb = isql.getWritableDatabase();
                     isql.insertItinerary(resultPnC, isdb, new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new java.util.Date()));
+                    isdb.close();
                     generateItinerary(resultPnC);
                     animScreen = 4;
                     nextScreen = 5;
@@ -198,6 +201,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     resultPnC = SearchUtils.getBestPath((ArrayList) SearchUtils.generateAllPaths(feedArray), budget, allLocations, hotel);
                     SQLiteDatabase isdb = isql.getWritableDatabase();
                     isql.insertItinerary(resultPnC, isdb, new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new java.util.Date()));
+                    isdb.close();
                     generateItinerary(resultPnC);
                     animScreen = 4;
                     nextScreen = 5;
@@ -206,6 +210,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         });
+
+
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -233,13 +239,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         checkItinerary.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 ItineraryStoreSQL isql = new ItineraryStoreSQL(getApplicationContext());
-                SQLiteDatabase db = isql.getWritableDatabase();
                 pncList = isql.getAllItineraries();
                 itineraryList.setAdapter(new ListAdapter(MainActivity.this, pncList));
                 animScreen = 1;
                 nextScreen = 7;
                 animationStart();
                 currScreen = 7;
+            }
+        });
+
+        FloatingActionButton clearHistory = (FloatingActionButton) findViewById(R.id.clearHistory);
+        clearHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pncList.clear();
+                ItineraryStoreSQL isql = new ItineraryStoreSQL(getApplicationContext());
+                SQLiteDatabase db = isql.getWritableDatabase();
+                isql.deleteTable();
+                isql.onCreate(db);
+                itineraryList.setAdapter(new ListAdapter(MainActivity.this, pncList));
             }
         });
 

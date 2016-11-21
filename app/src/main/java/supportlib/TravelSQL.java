@@ -110,11 +110,11 @@ public class TravelSQL extends SQLiteOpenHelper {
 
         cv = new ContentValues();
         cv.put("location","Chinatown");
-        cv.put("publiccost","1.88,1.96,2.11,4.99,1.91,0.0");
-        cv.put("publictime","86,87,86,96,84,0");
-        cv.put("privatecost","22.48,19.40,21.48,23.68,21.60,0.0");
-        cv.put("privatetime","32,29,32,36,30,0");
-        cv.put("foottime","269,264,270,285,264,0");
+        cv.put("publiccost","0.99,0.88,0.88,2.88,0.78,1.82,0.78,1.3,0.0,1.39");
+        cv.put("publictime","27,29,21,41,10,72,20,35,0,38");
+        cv.put("privatecost","4.7,5.36,9.03,10.68,3.6,20.1,4.04,12.62,0.0,12.4");
+        cv.put("privatetime","28,38,50,62,5,282,16,110,0,230");
+        cv.put("foottime","28,38,50,62,5,282,16,110,0,230");
         cv.put("type","attraction");
         cv.put("image", R.mipmap.chinatown);
         db.insert("LocationsTable",null,cv);
