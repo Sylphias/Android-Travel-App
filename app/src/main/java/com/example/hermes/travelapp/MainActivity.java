@@ -2,9 +2,14 @@ package com.example.hermes.travelapp;
 
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -65,6 +70,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private GoogleMap mMap;
     private LatLng curr;
+
+    String copy2clip;
 
     PathsAndCost exhaustivePnC;
     PathsAndCost fastApproxPnC;
@@ -133,36 +140,48 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 animationStart();
                 currScreen = 4;
 
+                copy2clip = "M Y   I T I N E R A R Y\n\n";
                 linearLayout.removeAllViews();
 
                 for (int i = 0; i < fastApproxPnC.getPath().size();i++){
                     ArrayList<String> xx = new ArrayList<>();
                     xx.add(fastApproxPnC.getPath().get(i).getFrom());
                     genElement(xx, 0);
+                    if(i==0)
+                        copy2clip = copy2clip + "Start from home!\n\n";
+                    if(i!=0)
+                        copy2clip = copy2clip + "Destination "+(i)+": "+fastApproxPnC.getPath().get(i).getFrom()+"\n\n";
                     Double cost = fastApproxPnC.getPath().get(i).getCost();
                     cost = round(cost * 100.00)/100.00;
                     if (fastApproxPnC.getPath().get(i).getMode() == TRANSPORTATION.TAXI) {
                         xx = new ArrayList<>();
                         xx.add(Integer.toString(fastApproxPnC.getPath().get(i).getDuration()));
                         xx.add("$"+Double.toString(cost));
+                        copy2clip = copy2clip+"Take a cab for around "+"$"+Double.toString(cost)+" for "+Integer.toString(fastApproxPnC.getPath().get(i).getDuration())+"mins";
                         genElement(xx, 2);
                     }
                     else {
                         xx = new ArrayList<>();
-                        if (fastApproxPnC.getPath().get(i).getMode() == TRANSPORTATION.BUS)
+                        if (fastApproxPnC.getPath().get(i).getMode() == TRANSPORTATION.BUS) {
                             xx.add("Take Public Transport");
-                        else
+                            copy2clip = copy2clip+"Take public transport for around "+"$"+Double.toString(cost)+" for "+Integer.toString(fastApproxPnC.getPath().get(i).getDuration())+"mins";
+                        }
+                        else {
                             xx.add("Take a Walk!");
+                            copy2clip = copy2clip+"Walk from here for "+Integer.toString(fastApproxPnC.getPath().get(i).getDuration())+"mins";
+                        }
                         xx.add(Integer.toString(fastApproxPnC.getPath().get(i).getDuration()));
                         xx.add("$"+Double.toString(cost));
                         genElement(xx,1);
                     }
+                    copy2clip = copy2clip + "\n";
 
                 }
 
                 ArrayList<String> xx = new ArrayList<>();
                 xx.add(fastApproxPnC.getPath().get(fastApproxPnC.getPath().size()-1).getTo());
                 genElement(xx, 0);
+                copy2clip = copy2clip + "Back home!\n";
 
 
             }
@@ -187,12 +206,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 nearbySearch(v);
             }
         });
-
-        ArrayList<ArrayList<String>> b = new ArrayList<>();
-        ArrayList<String> a = new ArrayList<>();
-
-
-
 
 
         //call genElement here for each destination and travel method
@@ -623,6 +636,33 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             opAnimScreenInLeft.start();
             currScreen -= 1;
         }
+
+
+
+    }
+
+    public void StartUber(View v){
+        PackageManager pm = getPackageManager();
+        try {
+            pm.getPackageInfo("com.ubercab", PackageManager.GET_ACTIVITIES);
+            String uri = "uber://?action=setPickup&pickup=my_location";
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(uri));
+            startActivity(intent);
+        } catch (PackageManager.NameNotFoundException e) {
+            try {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.ubercab")));
+            } catch (android.content.ActivityNotFoundException anfe) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=com.ubercab")));
+            }
+        }
+    }
+
+    public void Copy2Clip(View v){
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("TravelItineraryAppStuff", copy2clip);
+        clipboard.setPrimaryClip(clip);
+        Toast.makeText(getApplicationContext(), "Your itinerary has been copied to the clipboard!", Toast.LENGTH_SHORT).show();
     }
 
 
