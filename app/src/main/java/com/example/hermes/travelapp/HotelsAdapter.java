@@ -48,7 +48,7 @@ class HotelsAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int i) {
-        return mItems.get(i).drawableId;
+        return mItems.get(i).locationId;
     }
 
     @Override

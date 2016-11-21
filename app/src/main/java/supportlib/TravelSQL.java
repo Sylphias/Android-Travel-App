@@ -169,7 +169,7 @@ public class TravelSQL extends SQLiteOpenHelper {
     public ArrayList<Location> getHotels(){
         ArrayList<Location> hotelsList= new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("select * from LocationsTable WHERE type=hotel",null);
+        Cursor res = db.rawQuery("select * from LocationsTable WHERE type = \"hotel\"",null);
         res.moveToFirst();
 
         while(res.isAfterLast() == false){
@@ -193,7 +193,7 @@ public class TravelSQL extends SQLiteOpenHelper {
     public ArrayList<Location> getAllExceptHotel(Integer loc){
         ArrayList<Location> hotelsList= new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("select * from LocationsTable WHERE type=hotel EXCEPT select * from LocationTable WHERE id="+loc,null);
+        Cursor res = db.rawQuery("select * from LocationsTable EXCEPT select * from LocationsTable WHERE id = "+loc + 1,null);
         res.moveToFirst();
 
         while(res.isAfterLast() == false){
