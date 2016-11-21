@@ -88,7 +88,6 @@ public class TravelSQL extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-
     public ArrayList<Location> getAllEntries() {
         ArrayList<Location> array_list = new ArrayList<Location>();
         SQLiteDatabase db = this.getReadableDatabase();

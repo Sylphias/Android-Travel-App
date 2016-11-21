@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import supportlib.HawkerUtils;
 import supportlib.Location;
 import supportlib.NearestNeighbour;
 import supportlib.PathsAndCost;
@@ -148,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     xx.add(fastApproxPnC.getPath().get(i).getFrom());
                     genElement(xx, 0);
                     if(i==0)
-                        copy2clip = copy2clip + "Start from home!\n\n";
+                        copy2clip = copy2clip + "Start from hotel!\n\n";
                     if(i!=0)
                         copy2clip = copy2clip + "Destination "+(i)+": "+fastApproxPnC.getPath().get(i).getFrom()+"\n\n";
                     Double cost = fastApproxPnC.getPath().get(i).getCost();
@@ -181,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 ArrayList<String> xx = new ArrayList<>();
                 xx.add(fastApproxPnC.getPath().get(fastApproxPnC.getPath().size()-1).getTo());
                 genElement(xx, 0);
-                copy2clip = copy2clip + "Back home!\n";
+                copy2clip = copy2clip + "Back at your hotel!\n";
 
 
             }
@@ -502,7 +503,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }*/
 
     public void nearbySearch(View v){
-        ArrayList<ArrayList<String>> nearby = getNearbyHawkers(getHawkerLocations(),curr.latitude,curr.longitude);
+        ArrayList<ArrayList<String>> nearby = HawkerUtils.getNearbyHawkers(HawkerUtils.getHawkerLocations(getResources()),curr.latitude,curr.longitude);
         if(nearby.size() ==0){
             Toast toast = Toast.makeText(getApplicationContext(), "No nearby hawkers", Toast.LENGTH_SHORT);
             toast.show();
@@ -513,56 +514,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    public ArrayList<ArrayList<String>> getHawkerLocations() {
-        String line = null;
-        InputStream is = null;
-        ArrayList<ArrayList<String>> big = new ArrayList<ArrayList<String>>();
-        try {
-            is = getResources().openRawResource(R.raw.hawkers);
-            //is = new FileInputStream("C:\\Users\\tycli_000\\AndroidStudioProjects\\TestAndr\\app\\src\\main\\res\\raw\\hawkers
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            boolean nameflag = false;
-            ArrayList<String> smol = new ArrayList<String>();
-            while ((line = br.readLine()) != null) {
-                if(line.contains("<name>") && !line.contains("<name>HAWKERCENTRE")){
-                    smol.add(line.trim().replace("<name>", "").replace("</name>", ""));
-                    nameflag = true;
-                }else if(line.contains("<coordinates>") && nameflag){
-                    String[] tmp = line.trim().split(",");
-                    smol.add(0,tmp[1]);
-                    smol.add(0, tmp[0].split(" ")[1]);
-                    big.add(smol);
-                    smol = new ArrayList<String>();
-                    nameflag = false;
-                }
-            }
-            br.close();
-        }
-        catch(IOException ioe){
-            ioe.printStackTrace();
-        }
-        catch(Exception er){
-            er.printStackTrace();
-        }
 
-        return big;
-    }
-
-    public ArrayList<ArrayList<String>> getNearbyHawkers(ArrayList<ArrayList<String>> inpt,double lat, double lon){
-        //data is long lat
-        double modval = 0.025;
-        ArrayList<ArrayList<String>> ret = new ArrayList<ArrayList<String>>();
-        for(int i =0;i<inpt.size();i++){
-            //if within bounding box
-            if((!(lon+modval < Double.parseDouble(inpt.get(i).get(0)) ||
-                    lon-modval > Double.parseDouble(inpt.get(i).get(0))) &&
-                    !(lat+modval < Double.parseDouble(inpt.get(i).get(1)) ||
-                            lat-modval > Double.parseDouble(inpt.get(i).get(1))))){
-                ret.add(inpt.get(i));
-            }
-        }
-        return ret;
-    }
 
     public void roadmap(View v){
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
@@ -605,7 +557,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         linearLayout.addView(view);
-
     }
 
     public void animationStart(){
