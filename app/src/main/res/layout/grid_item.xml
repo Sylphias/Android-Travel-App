@@ -16,7 +16,8 @@
         android:layout_height="match_parent"
         app:srcCompat="@mipmap/tick"
         android:id="@+id/imageViewTick"
-        android:visibility="invisible" />
+        android:visibility="invisible"
+        android:scaleType="centerCrop" />
 
     <TextView
         android:id="@+id/text"
