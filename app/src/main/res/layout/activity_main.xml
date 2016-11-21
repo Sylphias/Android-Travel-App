@@ -18,7 +18,7 @@
         android:visibility="visible" />
 
     <include layout="@layout/destinations"
-        android:visibility="invisible" />
+        android:visibility="visible" />
 
     <include layout="@layout/budget"
         android:visibility="invisible" />

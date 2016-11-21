@@ -27,6 +27,7 @@ public class TravelSQL extends SQLiteOpenHelper {
         cv.put("privatecost","0.0,3.22,6.96,8.50,4.98,18.40");
         cv.put("privatetime","0,3,14,19,8,30");
         cv.put("foottime","0,14,69,76,28,269");
+        cv.put("type","hotel");
         cv.put("image", R.mipmap.marinabaysands);
         db.insert("LocationsTable",null,cv);
 
@@ -37,6 +38,7 @@ public class TravelSQL extends SQLiteOpenHelper {
         cv.put("privatecost","4.32,0.0,7.84,9.38,4.76,18.18");
         cv.put("privatetime","6,0,13,18,8,29");
         cv.put("foottime","14,0,81,88,39,264");
+        cv.put("type","attraction");
         cv.put("image", R.mipmap.singaporeflyer);
         db.insert("LocationsTable",null,cv);
 
@@ -47,6 +49,7 @@ public class TravelSQL extends SQLiteOpenHelper {
         cv.put("privatecost","8.30,7.96,0.0,4.54,6.42,22.58");
         cv.put("privatetime","12,14,0,9,11,31");
         cv.put("foottime","69,81,0,12,47,270");
+        cv.put("type","attraction");
         cv.put("image", R.mipmap.vivocity);
         db.insert("LocationsTable",null,cv);
 
@@ -57,6 +60,7 @@ public class TravelSQL extends SQLiteOpenHelper {
         cv.put("privatecost","8.74,8.40,3.22,0.0,6.64,22.80");
         cv.put("privatetime","13,14,4,0,12,32");
         cv.put("foottime","76,88,12,0,55,285");
+        cv.put("type","hotel");
         cv.put("image", R.mipmap.resortsworldsentosa);
         db.insert("LocationsTable",null,cv);
 
@@ -67,6 +71,7 @@ public class TravelSQL extends SQLiteOpenHelper {
         cv.put("privatecost","5.32,4.76,4.98,6.52,0.0,18.40");
         cv.put("privatetime","7,8,9,14,0,30");
         cv.put("foottime","28,39,47,55,0,264");
+        cv.put("type","attraction");
         cv.put("image", R.mipmap.buddhatemple);
         db.insert("LocationsTable",null,cv);
 
@@ -77,6 +82,7 @@ public class TravelSQL extends SQLiteOpenHelper {
         cv.put("privatecost","22.48,19.40,21.48,23.68,21.60,0.0");
         cv.put("privatetime","32,29,32,36,30,0");
         cv.put("foottime","269,264,270,285,264,0");
+        cv.put("type","attraction");
         cv.put("image", R.mipmap.singaporezoo);
         db.insert("LocationsTable",null,cv);
     }
@@ -104,6 +110,7 @@ public class TravelSQL extends SQLiteOpenHelper {
                     res.getString(res.getColumnIndex("privatecost")),
                     res.getString(res.getColumnIndex("privatetime")),
                     res.getString(res.getColumnIndex("foottime")),
+                    res.getString(res.getColumnIndex("type")),
                     res.getInt(res.getColumnIndex("image"))
             ));
             res.moveToNext();
@@ -130,6 +137,7 @@ public class TravelSQL extends SQLiteOpenHelper {
                 res.getString(res.getColumnIndex("privatecost")),
                 res.getString(res.getColumnIndex("privatetime")),
                 res.getString(res.getColumnIndex("foottime")),
+                res.getString(res.getColumnIndex("type")),
                 res.getInt(res.getColumnIndex("image"))
         );
         return ret;
@@ -153,6 +161,7 @@ public class TravelSQL extends SQLiteOpenHelper {
                 res.getString(res.getColumnIndex("privatecost")),
                 res.getString(res.getColumnIndex("privatetime")),
                 res.getString(res.getColumnIndex("foottime")),
+                res.getString(res.getColumnIndex("type")),
                 res.getInt(res.getColumnIndex("image"))
         );
         return ret;

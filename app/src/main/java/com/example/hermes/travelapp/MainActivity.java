@@ -84,8 +84,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_main);
         screen1 = (RelativeLayout) findViewById(R.id.content_main);
         screen2 = (RelativeLayout) findViewById(R.id.budget);
-        screen3 = (RelativeLayout) findViewById(R.id.destinations);
-        screen4 = (RelativeLayout) findViewById(R.id.activity_itinerary);
+        screen3 = (RelativeLayout) findViewById(R.id.hotels);
+        screen4 = (RelativeLayout) findViewById(R.id.destinations);
+        screen5 = (RelativeLayout) findViewById(R.id.activity_itinerary);
         screen6 = (RelativeLayout) findViewById(R.id.maps);
         screen1.setVisibility(View.VISIBLE);
         screen2.setX(2000);
@@ -473,33 +474,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
     }
-
-
-    /*@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.toolbar, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_settings1:
-                mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                return true;
-
-            case R.id.action_settings2:
-                mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-                return true;
-
-            default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
-                return super.onOptionsItemSelected(item);
-
-        }
-    }*/
 
     public void nearbySearch(View v){
         ArrayList<ArrayList<String>> nearby = getNearbyHawkers(getHawkerLocations(),curr.latitude,curr.longitude);
