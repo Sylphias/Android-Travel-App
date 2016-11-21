@@ -17,7 +17,8 @@
             android:layout_marginRight="7dp"
             android:layout_marginLeft="7dp"
             android:layout_marginBottom="7dp"
-            android:layout_marginTop="7dp" />
+            android:layout_marginTop="7dp"
+            android:onClick="StartUber"/>
 
         <TextView
             android:text="Take a cab!"

@@ -3,8 +3,11 @@ package com.example.hermes.travelapp;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -615,6 +618,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             posAnimScreenInLeft.start();
             opAnimScreenInLeft.start();
             currScreen -= 1;
+        }
+
+
+
+    }
+
+    public void StartUber(View v){
+        PackageManager pm = getPackageManager();
+        try {
+            pm.getPackageInfo("com.ubercab", PackageManager.GET_ACTIVITIES);
+            String uri = "uber://?action=setPickup&pickup=my_location";
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(uri));
+            startActivity(intent);
+        } catch (PackageManager.NameNotFoundException e) {
+            try {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.ubercab")));
+            } catch (android.content.ActivityNotFoundException anfe) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=com.ubercab")));
+            }
         }
     }
 
