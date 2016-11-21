@@ -49,7 +49,7 @@ public class ListAdapter extends BaseAdapter {
         TextView name;
 
         if (v == null) {
-            v = mInflater.inflate(R.layout.grid_item, viewGroup, false);
+            v = mInflater.inflate(R.layout.list_item, viewGroup, false);
             v.setTag(R.id.listItemName, v.findViewById(R.id.listItemName));
         }
 

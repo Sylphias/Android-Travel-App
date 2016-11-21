@@ -244,16 +244,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-        //call genElement here for each destination and travel method
-        //format: genElement( ArrayList of string , identifierCode)
-        //case 0: display destination card with just destination name
-        //string contains at position 0:name of destination
-        //case 1: display travel by public or foot card with time
-        //string contains at position 0:travel by foot/take public transport
-        //at position 1: time required
-        //case 2: display clickable private transport which opens uber app with time
-        //string contains at position 0: time taken
-
     }
 
     public void onWindowFocusChanged(boolean hasFocus) {
@@ -517,8 +507,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-
-
     public void roadmap(View v){
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
     }
@@ -663,7 +651,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         clipboard.setPrimaryClip(clip);
         Toast.makeText(getApplicationContext(), "Your itinerary has been copied to the clipboard!", Toast.LENGTH_SHORT).show();
     }
-
 
 }
 
