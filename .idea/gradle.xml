@@ -8,8 +8,8 @@
         <option name="gradleHome" value="D:\Program Files\Android\Android Studio\gradle\gradle-2.14.1" />
         <option name="modules">
           <set>
-            <option value="$USER_HOME$/Dropbox (Personal)/School/School/Term 4/Info Sys Notes/Android-Travel-App" />
-            <option value="$USER_HOME$/Dropbox (Personal)/School/School/Term 4/Info Sys Notes/Android-Travel-App/app" />
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/app" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

@@ -59,7 +59,7 @@
         android:layout_toStartOf="@+id/mapSubmitBtn" />
 
     <Button
-        android:text="Satellite View"
+        android:text="Satellite"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -69,7 +69,7 @@
         android:onClick="satellite" />
 
     <Button
-        android:text="roadmap view"
+        android:text="roadmap"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/roadmap"

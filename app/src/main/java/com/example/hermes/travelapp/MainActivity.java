@@ -585,6 +585,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         opAnimScreenOutLeft.start();
         posAnimScreenInRight.start();
         opAnimScreenInRight.start();
+        for (int i = 1; i < screens.size(); i++){
+            if (i != animScreen && i != nextScreen){
+                screens.get(i).setX(2000);
+            }
+        }
     }
 
     public void onBackPressed() {
@@ -596,6 +601,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             opAnimScreenOutRight.start();
             posAnimScreenInLeft.start();
             opAnimScreenInLeft.start();
+            for (int i = 1; i < screens.size(); i++){
+                if (i != animScreen && i != nextScreen){
+                    screens.get(i).setX(2000);
+                }
+            }
             currScreen = 1;
         }
         else{
@@ -605,6 +615,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             opAnimScreenOutRight.start();
             posAnimScreenInLeft.start();
             opAnimScreenInLeft.start();
+            for (int i = 1; i < screens.size(); i++){
+                if (i != animScreen && i != nextScreen){
+                    screens.get(i).setX(2000);
+                }
+            }
             currScreen -= 1;
         }
 
