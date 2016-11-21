@@ -193,7 +193,8 @@ public class TravelSQL extends SQLiteOpenHelper {
     public ArrayList<Location> getAllExceptHotel(Integer loc){
         ArrayList<Location> hotelsList= new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("select * from LocationsTable EXCEPT select * from LocationsTable WHERE id = "+loc + 1,null);
+        loc = loc + 1;
+        Cursor res = db.rawQuery("select * from LocationsTable EXCEPT select * from LocationsTable WHERE id = "+ loc,null);
         res.moveToFirst();
 
         while(res.isAfterLast() == false){
