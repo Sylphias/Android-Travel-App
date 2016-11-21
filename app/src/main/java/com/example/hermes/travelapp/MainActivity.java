@@ -116,11 +116,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     int position, long id) {
                 if(! selectedLoc.contains(position)){
                     selectedLoc.add(position);
-                    gridview.getChildAt(position).findViewById(R.id.imageView2).setVisibility(View.VISIBLE);
+                    gridview.getChildAt(position).findViewById(R.id.imageViewTick).setVisibility(View.VISIBLE);
                 }
                 else{
                     selectedLoc.remove(selectedLoc.indexOf(position));
-                    gridview.getChildAt(position).findViewById(R.id.imageView2).setVisibility(View.INVISIBLE);
+                    gridview.getChildAt(position).findViewById(R.id.imageViewTick).setVisibility(View.INVISIBLE);
                 }
             }
         });
@@ -130,8 +130,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                HashMap<Integer, Location> lol  = SearchUtils.getRawData(selectedLoc, getApplicationContext());
-                exhaustivePnC = SearchUtils.getBestPath((ArrayList) SearchUtils.generateAllPaths(selectedLoc),budget,lol);
+                ArrayList<Integer> feedArray = new ArrayList<Integer>();
+                for (int i = 0; i < selectedLoc.size(); i++) feedArray.add(selectedLoc.get(i));
+                HashMap<Integer, Location> lol  = SearchUtils.getRawData(feedArray, getApplicationContext());
+                exhaustivePnC = SearchUtils.getBestPath((ArrayList) SearchUtils.generateAllPaths(feedArray),budget,lol);
                 fastApproxPnC = NearestNeighbour.getApproximatedPath(lol,budget);
                 animScreen = 3;
                 nextScreen = 4;
@@ -403,6 +405,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         else{
             budget = Double.parseDouble(((EditText) findViewById(R.id.editText2)).getText().toString());
+            selectedLoc.clear();
+            GridView gridview = (GridView) findViewById(R.id.gridview);
+            for (int i = 0; i < gridview.getChildCount(); i++){
+                gridview.getChildAt(i).findViewById(R.id.imageViewTick).setVisibility(View.INVISIBLE);
+            }
             hideKeyboard(MainActivity.this);
             animScreen = 2;
             nextScreen = 3;
