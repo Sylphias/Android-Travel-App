@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     HashMap<Integer, Location> allLocations  = SearchUtils.getRawData(feedArray, getApplicationContext(), hotel);
                     resultPnC = NearestNeighbour.getApproximatedPath(allLocations,budget,hotel);
                     SQLiteDatabase isdb = isql.getWritableDatabase();
-                    isql.insertItinerary(resultPnC, isdb, new SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()));
+                    isql.insertItinerary(resultPnC, isdb, new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new java.util.Date()));
                     generateItinerary(resultPnC);
                     animScreen = 4;
                     nextScreen = 5;
@@ -190,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     HashMap<Integer, Location> allLocations = SearchUtils.getRawData(feedArray, getApplicationContext(), hotel);
                     resultPnC = SearchUtils.getBestPath((ArrayList) SearchUtils.generateAllPaths(feedArray), budget, allLocations, hotel);
                     SQLiteDatabase isdb = isql.getWritableDatabase();
-                    isql.insertItinerary(resultPnC, isdb, new SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()));
+                    isql.insertItinerary(resultPnC, isdb, new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new java.util.Date()));
                     ArrayList<PathsAndCost> rawr = isql.getAllItineraries();
                     generateItinerary(resultPnC);
                     animScreen = 4;
