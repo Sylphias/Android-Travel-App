@@ -94,15 +94,14 @@ public class TravelSQL extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-
     public ArrayList<Location> getAllEntries() {
-        ArrayList<Location> array_list = new ArrayList<Location>();
+        ArrayList<Location> locationsList = new ArrayList<Location>();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res =  db.rawQuery( "select * from LocationsTable", null );
         res.moveToFirst();
 
         while(res.isAfterLast() == false){
-            array_list.add(new Location(
+            locationsList.add(new Location(
                     res.getString(res.getColumnIndex("id")), //id starts from 1, handled in Location constructor
                     res.getString(res.getColumnIndex("location")),
                     res.getString(res.getColumnIndex("publiccost")),
@@ -116,7 +115,7 @@ public class TravelSQL extends SQLiteOpenHelper {
             res.moveToNext();
         }
         res.close();
-        return array_list;
+        return locationsList;
     }
 
     /*
@@ -165,6 +164,54 @@ public class TravelSQL extends SQLiteOpenHelper {
                 res.getInt(res.getColumnIndex("image"))
         );
         return ret;
+    }
+
+    public ArrayList<Location> getHotels(){
+        ArrayList<Location> hotelsList= new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select * from LocationsTable WHERE type=hotel",null);
+        res.moveToFirst();
+
+        while(res.isAfterLast() == false){
+            hotelsList.add(new Location(
+                    res.getString(res.getColumnIndex("id")), //id starts from 1, handled in Location constructor
+                    res.getString(res.getColumnIndex("location")),
+                    res.getString(res.getColumnIndex("publiccost")),
+                    res.getString(res.getColumnIndex("publictime")),
+                    res.getString(res.getColumnIndex("privatecost")),
+                    res.getString(res.getColumnIndex("privatetime")),
+                    res.getString(res.getColumnIndex("foottime")),
+                    res.getString(res.getColumnIndex("type")),
+                    res.getInt(res.getColumnIndex("image"))
+            ));
+            res.moveToNext();
+        }
+        res.close();
+        return hotelsList;
+    }
+
+    public ArrayList<Location> getAllExceptHotel(Location loc){
+        ArrayList<Location> hotelsList= new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select * from LocationsTable WHERE type=hotel EXCEPT select * from LocationTable WHERE id="+loc.getId(),null);
+        res.moveToFirst();
+
+        while(res.isAfterLast() == false){
+            hotelsList.add(new Location(
+                    res.getString(res.getColumnIndex("id")), //id starts from 1, handled in Location constructor
+                    res.getString(res.getColumnIndex("location")),
+                    res.getString(res.getColumnIndex("publiccost")),
+                    res.getString(res.getColumnIndex("publictime")),
+                    res.getString(res.getColumnIndex("privatecost")),
+                    res.getString(res.getColumnIndex("privatetime")),
+                    res.getString(res.getColumnIndex("foottime")),
+                    res.getString(res.getColumnIndex("type")),
+                    res.getInt(res.getColumnIndex("image"))
+            ));
+            res.moveToNext();
+        }
+        res.close();
+        return hotelsList;
     }
 
     public boolean deleteTable(){
