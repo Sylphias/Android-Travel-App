@@ -13,20 +13,6 @@
     tools:context="com.example.hermes.travelapp.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        app:fabSize="mini"
-        app:srcCompat="@android:drawable/ic_media_play"
-        android:id="@+id/fab2"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="16dp"
-        app:elevation="10dp" />
-
     <GridView
         android:id="@+id/gridview"
         android:layout_width="match_parent"
@@ -46,5 +32,32 @@
         android:id="@+id/imageView4"
         android:scaleType="centerCrop"
         android:layout_height="45dp" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        app:fabSize="mini"
+        app:srcCompat="@mipmap/fastfab"
+        android:id="@+id/fastFab"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp"
+        app:elevation="10dp" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        app:fabSize="mini"
+        app:srcCompat="@mipmap/normalfab"
+        android:id="@+id/normalFab"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_above="@+id/fastFab"
+        android:layout_alignLeft="@+id/fastFab"
+        android:layout_alignStart="@+id/fastFab" />
 
 </RelativeLayout>

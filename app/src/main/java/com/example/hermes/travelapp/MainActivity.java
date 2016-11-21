@@ -1,6 +1,5 @@
 package com.example.hermes.travelapp;
 
-import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.ClipData;
@@ -18,23 +17,15 @@ import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.text.Layout;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,10 +37,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -151,24 +139,49 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab2);
-        fab.setImageBitmap(textAsBitmap("Fast Approximation", 40, Color.WHITE));
+        FloatingActionButton fastFab = (FloatingActionButton) findViewById(R.id.fastFab);
         linearLayout = (ViewGroup) findViewById(R.id.scroller);
-        fab.setOnClickListener(new View.OnClickListener() {
+        fastFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ArrayList<Integer> feedArray = new ArrayList<Integer>();
-                for (int i = 0; i < selectedLoc.size(); i++) feedArray.add(selectedLoc.get(i));
-                HashMap<Integer, Location> allLocations  = SearchUtils.getRawData(feedArray, getApplicationContext(), hotel);
-                resultPnC = SearchUtils.getBestPath((ArrayList) SearchUtils.generateAllPaths(feedArray),budget,allLocations,hotel);
-                resultPnC = NearestNeighbour.getApproximatedPath(allLocations,budget,hotel);
-                generateItinerary();
-                animScreen = 4;
-                nextScreen = 5;
-                animationStart();
-                currScreen = 5;
+                if (selectedLoc.size() == 0){
+                    Toast toast = Toast.makeText(MainActivity.this,"Select at least one location!", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+                else{
+                    ArrayList<Integer> feedArray = new ArrayList<Integer>();
+                    for (int i = 0; i < selectedLoc.size(); i++) feedArray.add(selectedLoc.get(i));
+                    HashMap<Integer, Location> allLocations  = SearchUtils.getRawData(feedArray, getApplicationContext(), hotel);
+                    resultPnC = NearestNeighbour.getApproximatedPath(allLocations,budget,hotel);
+                    generateItinerary();
+                    animScreen = 4;
+                    nextScreen = 5;
+                    animationStart();
+                    currScreen = 5;
+                }
+            }
+        });
 
-
+        FloatingActionButton normalFab = (FloatingActionButton) findViewById(R.id.normalFab);
+        linearLayout = (ViewGroup) findViewById(R.id.scroller);
+        normalFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (selectedLoc.size() == 0){
+                    Toast toast = Toast.makeText(MainActivity.this,"Select at least one location!", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+                else {
+                    ArrayList<Integer> feedArray = new ArrayList<Integer>();
+                    for (int i = 0; i < selectedLoc.size(); i++) feedArray.add(selectedLoc.get(i));
+                    HashMap<Integer, Location> allLocations = SearchUtils.getRawData(feedArray, getApplicationContext(), hotel);
+                    resultPnC = SearchUtils.getBestPath((ArrayList) SearchUtils.generateAllPaths(feedArray), budget, allLocations, hotel);
+                    generateItinerary();
+                    animScreen = 4;
+                    nextScreen = 5;
+                    animationStart();
+                    currScreen = 5;
+                }
             }
         });
 

@@ -24,7 +24,7 @@ public class NearestNeighbour {
         HashMap<Integer,Location>  originalLocation = new HashMap<Integer, Location>();
         originalLocation.put(hotelID,locations.get(hotelID));
         int originalSize = locations.size();
-        current_location_id = locations.get(0).getId();
+        current_location_id = hotelID;
         PathInfo nextPath = getNextLocation(SearchUtils.getConnected(current_location_id,locations));
         double cost = nextPath.getCost();
         visited.add(nextPath);
