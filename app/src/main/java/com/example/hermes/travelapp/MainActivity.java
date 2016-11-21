@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                if(! selectedLoc.contains(position)){
+                if(! selectedLoc.contains((int) gridview.getAdapter().getItemId(position))){
                     selectedLoc.add((int) gridview.getAdapter().getItemId(position));
                     gridview.getChildAt(position).findViewById(R.id.imageViewTick).setVisibility(View.VISIBLE);
                 }
