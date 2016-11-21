@@ -19,7 +19,7 @@ public class TravelSQL extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create table if not exists LocationsTable (id integer primary key, location text, publictime text,privatetime text,foottime text, publiccost text, privatecost text, image integer)");
+        db.execSQL("create table if not exists LocationsTable (id integer primary key, location text, publictime text,privatetime text,foottime text, publiccost text, privatecost text, type text, image integer)");
         ContentValues cv = new ContentValues();
         cv.put("location","Marina Bay Sands");
         cv.put("publiccost","0.0,0.83,1.18,4.03,0.88,1.96");

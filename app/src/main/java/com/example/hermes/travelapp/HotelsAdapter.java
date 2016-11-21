@@ -18,21 +18,21 @@ import supportlib.TravelSQL;
 
 import static java.lang.Integer.parseInt;
 
-class ImageAdapter extends BaseAdapter {
+class HotelsAdapter extends BaseAdapter {
     private final List<Item> mItems = new ArrayList<Item>();
     private final LayoutInflater mInflater;
     private ArrayList<Location> locations = new ArrayList<Location>();
 
-    public ImageAdapter(Context context, int hotel) {
+    public HotelsAdapter(Context context) {
         TravelSQL tsql = new TravelSQL(context);
         SQLiteDatabase db = tsql.getWritableDatabase();
         tsql.onCreate(db);
         tsql.onUpgrade(db,0,1);
-        locations = tsql.getAllExceptHotel(hotel);
+        locations = tsql.getAllHotels();
 
         mInflater = LayoutInflater.from(context);
         for (int i = 0; i < locations.size(); i++) {
-            mItems.add(new Item(locations.get(i).getLocation(), locations.get(i).getImage(), locations.get(i).getId()));
+            mItems.add(new HotelsAdapter.Item(locations.get(i).getLocation(), locations.get(i).getImage(), locations.get(i).getId()));
         }
     }
 

@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     static int animScreen = 1;
     static int nextScreen;
     static int initial = 0;
+    static int hotel;
     static ArrayList<RelativeLayout> screens = new ArrayList<RelativeLayout>();
     RelativeLayout screen1, screen2, screen3, screen4, screen5, screen6;
     ArrayList<Integer> selectedLoc = new ArrayList<Integer>();
@@ -95,6 +96,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         screen3.setVisibility(View.VISIBLE);
         screen4.setX(2000);
         screen4.setVisibility(View.VISIBLE);
+        screen5.setX(2000);
+        screen5.setVisibility(View.VISIBLE);
         screen6.setX(2000);
         screen6.setVisibility(View.VISIBLE);
         screens.add(null);
@@ -109,18 +112,32 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
 
+        final GridView hotelsview = (GridView) findViewById(R.id.hotelsview);
+        hotelsview.setAdapter(new HotelsAdapter(this));
+
         final GridView gridview = (GridView) findViewById(R.id.gridview);
-        gridview.setAdapter(new ImageAdapter(this));
+
+        hotelsview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v,
+                                    int position, long id) {
+                hotel = ((ImageAdapter.Item) hotelsview.getAdapter().getItem(position)).locationId;
+                gridview.setAdapter(new ImageAdapter(MainActivity.this, hotel));
+                animScreen = 3;
+                nextScreen = 4;
+                animationStart();
+                currScreen = 4;
+            }
+        });
 
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
                 if(! selectedLoc.contains(position)){
-                    selectedLoc.add(position);
+                    selectedLoc.add(((ImageAdapter.Item) gridview.getAdapter().getItem(position)).locationId);
                     gridview.getChildAt(position).findViewById(R.id.imageViewTick).setVisibility(View.VISIBLE);
                 }
                 else{
-                    selectedLoc.remove(selectedLoc.indexOf(position));
+                    selectedLoc.remove(((ImageAdapter.Item) gridview.getAdapter().getItem(position)).locationId);
                     gridview.getChildAt(position).findViewById(R.id.imageViewTick).setVisibility(View.INVISIBLE);
                 }
             }
@@ -136,10 +153,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 HashMap<Integer, Location> lol  = SearchUtils.getRawData(feedArray, getApplicationContext());
                 exhaustivePnC = SearchUtils.getBestPath((ArrayList) SearchUtils.generateAllPaths(feedArray),budget,lol);
                 fastApproxPnC = NearestNeighbour.getApproximatedPath(lol,budget);
-                animScreen = 3;
-                nextScreen = 4;
+                animScreen = 4;
+                nextScreen = 5;
                 animationStart();
-                currScreen = 4;
+                currScreen = 5;
 
                 copy2clip = "M Y   I T I N E R A R Y\n\n";
                 linearLayout.removeAllViews();
