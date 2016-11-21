@@ -28,7 +28,7 @@ public class ItineraryStoreSQL extends SQLiteOpenHelper{
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create table if not exists PathsTable (id integer primary key, name text, cost real, path text");
+        db.execSQL("create table if not exists PathsTable (id integer primary key, name text, cost real, path text)");
         }
 
         @Override

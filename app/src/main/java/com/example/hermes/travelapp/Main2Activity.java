@@ -34,18 +34,18 @@ public class Main2Activity extends AppCompatActivity {
         test_location.add(3);
         test_location.add(4);
         List<Location> meme =  tsql.getAllEntries();
-        HashMap<Integer,Location> lol  = SearchUtils.getRawData(test_location,this.getApplicationContext());
-        PathsAndCost rawr = SearchUtils.getBestPath((ArrayList) SearchUtils.generateAllPaths(test_location),30,lol);
-        PathsAndCost rawr2 = NearestNeighbour.getApproximatedPath(lol,50);
-        //ArrayList<PathInfo> paths,double cost, double budget, HashMap<Integer,Location> locations
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+//        HashMap<Integer,Location> lol  = SearchUtils.getRawData(test_location,this.getApplicationContext());
+//        PathsAndCost rawr = SearchUtils.getBestPath((ArrayList) SearchUtils.generateAllPaths(test_location),30,lol);
+//        PathsAndCost rawr2 = NearestNeighbour.getApproximatedPath(lol,50);
+//        //ArrayList<PathInfo> paths,double cost, double budget, HashMap<Integer,Location> locations
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//            }
+//        });
     }
 
 }

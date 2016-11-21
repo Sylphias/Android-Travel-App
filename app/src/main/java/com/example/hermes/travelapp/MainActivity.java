@@ -38,11 +38,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import supportlib.HawkerUtils;
+import supportlib.ItineraryStoreSQL;
 import supportlib.Location;
 import supportlib.NearestNeighbour;
 import supportlib.PathsAndCost;
@@ -74,11 +77,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     PathsAndCost resultPnC;
 
     ViewGroup linearLayout;
-
+    ItineraryStoreSQL isql;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        isql = new ItineraryStoreSQL(getApplicationContext());
+        final SQLiteDatabase isdb = isql.getWritableDatabase();
+
+        isql.onCreate(isdb);
         screen1 = (RelativeLayout) findViewById(R.id.content_main);
         screen2 = (RelativeLayout) findViewById(R.id.budget);
         screen3 = (RelativeLayout) findViewById(R.id.hotels);
@@ -157,7 +164,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     for (int i = 0; i < selectedLoc.size(); i++) feedArray.add(selectedLoc.get(i));
                     HashMap<Integer, Location> allLocations  = SearchUtils.getRawData(feedArray, getApplicationContext(), hotel);
                     resultPnC = NearestNeighbour.getApproximatedPath(allLocations,budget,hotel);
-                    generateItinerary();
+                    SQLiteDatabase isdb = isql.getWritableDatabase();
+                    isql.insertItinerary(resultPnC, isdb, new SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()));
+                    generateItinerary(resultPnC);
                     animScreen = 4;
                     nextScreen = 5;
                     animationStart();
@@ -180,6 +189,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     for (int i = 0; i < selectedLoc.size(); i++) feedArray.add(selectedLoc.get(i));
                     HashMap<Integer, Location> allLocations = SearchUtils.getRawData(feedArray, getApplicationContext(), hotel);
                     resultPnC = SearchUtils.getBestPath((ArrayList) SearchUtils.generateAllPaths(feedArray), budget, allLocations, hotel);
+                    SQLiteDatabase isdb = isql.getWritableDatabase();
+                    isql.insertItinerary(resultPnC, isdb, new SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()));
+                    ArrayList<PathsAndCost> rawr = isql.getAllItineraries();
                     generateItinerary(resultPnC);
                     animScreen = 4;
                     nextScreen = 5;
