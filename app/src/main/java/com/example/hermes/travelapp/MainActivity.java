@@ -83,13 +83,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     ItineraryStoreSQL isql;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        screens.clear();
+        screens.clear(); //initialise screens ArrayList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //create database for storing itinerary
         isql = new ItineraryStoreSQL(getApplicationContext());
         final SQLiteDatabase isdb = isql.getWritableDatabase();
-
         isql.onCreate(isdb);
+
+        //create database for fetching locations
+        TravelSQL tsql = new TravelSQL(getApplicationContext());
+        SQLiteDatabase db = tsql.getWritableDatabase();
+        tsql.onUpgrade(db,1,2);
+
+        //assign screens
         screen1 = (RelativeLayout) findViewById(R.id.content_main);
         screen2 = (RelativeLayout) findViewById(R.id.budget);
         screen3 = (RelativeLayout) findViewById(R.id.hotels);
@@ -98,6 +106,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         screen6 = (RelativeLayout) findViewById(R.id.maps);
         screen7 = (RelativeLayout) findViewById(R.id.itinerary_list);
         screen8 = (RelativeLayout) findViewById(R.id.activity_itinerary);
+
+        //put other screens out of view
         screen1.setVisibility(View.VISIBLE);
         screen2.setX(2000);
         screen2.setVisibility(View.VISIBLE);
@@ -111,6 +121,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         screen6.setVisibility(View.VISIBLE);
         screen7.setX(2000);
         screen7.setVisibility(View.VISIBLE);
+
+        //add screens to screens ArrayList
         screens.add(null);
         screens.add(screen1);
         screens.add(screen2);
@@ -120,23 +132,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         screens.add(screen6);
         screens.add(screen7);
         screens.add(screen8);
+
+        //app initialisation variable
         initial = 0;
-        TravelSQL tsql = new TravelSQL(getApplicationContext());
-        SQLiteDatabase db = tsql.getWritableDatabase();
-        tsql.onUpgrade(db,1,2);
 
+        //hotels screen gridview
         final GridView hotelsview = (GridView) findViewById(R.id.hotelsview);
-        hotelsview.setAdapter(new HotelsAdapter(this));
+        hotelsview.setAdapter(new HotelsAdapter(this)); //set adapter to populate hotelsview
 
+        //destinations screen gridview
         final GridView gridview = (GridView) findViewById(R.id.gridview);
 
         hotelsview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                hotel = (int) hotelsview.getAdapter().getItemId(position);
-                selectedLoc.clear();
-                gridview.setAdapter(new ImageAdapter(MainActivity.this, hotel));
-                for (int i = 0; i < gridview.getChildCount(); i++){
+                hotel = (int) hotelsview.getAdapter().getItemId(position); //get starting location
+                selectedLoc.clear(); //clear selected destinations
+                gridview.setAdapter(new ImageAdapter(MainActivity.this, hotel)); //set adapter to populate destinations gridview
+                //remove all pre-existing ticks on destinations screen
+                for (int i = 0; i < gridview.getChildCount(); i++) {
                     gridview.getChildAt(i - gridview.getFirstVisiblePosition()).findViewById(R.id.imageViewTick).setVisibility(View.INVISIBLE);
                 }
                 animScreen = 3;
