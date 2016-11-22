@@ -4,6 +4,16 @@ package supportlib;
  * Created by Ilya on 17/11/16.
  */
 
+/**
+ Custom class to store information for one set of travel instructions.
+ Stores:
+ 1. To which destination
+ 2. From which destination
+ 3. IDs of above
+ 4. Cost of transport
+ 5. Mode of transport
+ **/
+
 public class PathInfo {
     String to, from;
     int toId, fromId,duration;
@@ -102,15 +112,14 @@ public class PathInfo {
         this.mode = mode;
     }
 
+
+    //Enum containing modes of travel because modes of travel are fixed.
     public enum TRANSPORTATION{
         WALKING, BUS, TAXI;
     }
 
 }
 
-enum TRANSPORTATION{
-    WALKING, BUS, TAXI;
-}
 
 
 

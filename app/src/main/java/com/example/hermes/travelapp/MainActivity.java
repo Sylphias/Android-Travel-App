@@ -59,6 +59,10 @@ import static java.lang.Math.round;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
+
+    /*
+    All variable initializers
+     */
     static ValueAnimator posAnim, opAnim, posAnim1, opAnim1, posAnim2, opAnim2, posAnim3, opAnim3, posAnimScreenOutLeft, opAnimScreenOutLeft, posAnimScreenOutRight, opAnimScreenOutRight, posAnimScreenInLeft, opAnimScreenInLeft, posAnimScreenInRight, opAnimScreenInRight;
     static int currScreen = 1;
     static int animScreen = 1;
@@ -69,18 +73,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     RelativeLayout screen1, screen2, screen3, screen4, screen5, screen6, screen7, screen8;
     ArrayList<Integer> selectedLoc = new ArrayList<Integer>();
     static double budget = 0;
-
     private GoogleMap mMap;
     private LatLng curr;
-
     String copy2clip;
-
     PathsAndCost resultPnC;
-
     ArrayList<PathsAndCost> pncList;
-
     ViewGroup linearLayout;
     ItineraryStoreSQL isql;
+
+
+
+    /*
+    Main onCreate class
+    */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         screens.clear(); //initialise screens ArrayList
@@ -290,6 +295,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+
+    /*
+    Functionality, UI and animation methods
+    */
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
 
@@ -461,6 +470,59 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    public void animationStart(){
+        animScreen = currScreen;
+        posAnimScreenOutLeft.start();
+        opAnimScreenOutLeft.start();
+        posAnimScreenInRight.start();
+        opAnimScreenInRight.start();
+        for (int i = 1; i < screens.size(); i++){
+            if (i != animScreen && i != nextScreen){
+                screens.get(i).setX(2000);
+            }
+        }
+    }
+
+    public void onBackPressed() {
+        if (currScreen == 1) super.onBackPressed();
+        else if (currScreen == 6 || currScreen == 7){
+            animScreen = currScreen;
+            nextScreen = 1;
+            posAnimScreenOutRight.start();
+            opAnimScreenOutRight.start();
+            posAnimScreenInLeft.start();
+            opAnimScreenInLeft.start();
+            for (int i = 1; i < screens.size(); i++){
+                if (i != animScreen && i != nextScreen){
+                    screens.get(i).setX(2000);
+                }
+            }
+            currScreen = 1;
+        }
+        else{
+            animScreen = currScreen;
+            nextScreen = currScreen - 1;
+            posAnimScreenOutRight.start();
+            opAnimScreenOutRight.start();
+            posAnimScreenInLeft.start();
+            opAnimScreenInLeft.start();
+            for (int i = 1; i < screens.size(); i++){
+                if (i != animScreen && i != nextScreen){
+                    screens.get(i).setX(2000);
+                }
+            }
+            currScreen -= 1;
+        }
+
+
+
+    }
+
+    public static void hideKeyboard(Activity act) {
+        InputMethodManager inputMethodManager = (InputMethodManager) act.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(act.getCurrentFocus().getWindowToken(), 0);
+    }
+
     public void budget(View v){
         animScreen = 1;
         nextScreen = 2;
@@ -470,8 +532,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public void submitBudget(View v){
         if ((((EditText) findViewById(R.id.editText2)).getText().toString()).equals("")){
-                    Toast toast = Toast.makeText(this,"Invalid entry!", Toast.LENGTH_SHORT);
-                    toast.show();
+            Toast toast = Toast.makeText(this,"Invalid entry!", Toast.LENGTH_SHORT);
+            toast.show();
         }
         else{
             budget = Double.parseDouble(((EditText) findViewById(R.id.editText2)).getText().toString());
@@ -484,16 +546,113 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+
+    /*
+    Methods to generate itinerary after processing
+    */
+    public void genElement(ArrayList<String> a, int type){
+
+        /*
+        The UI for itinerary is made up of several 'cards' of which the layout XMLs have been defined.
+        The code below takes the variable 'type' and then decides which layout to add to the itinerary View.
+        0: Destination card for displaying destination name
+        1: Travel method card to display all travel methods except Taxi.
+        2: Travel method card for taxi (implements Uber app functionality)
+         */
+
+        LayoutInflater inflater=LayoutInflater.from(this);
+        View view;
+
+        switch(type){
+            case 0:
+                view = inflater.inflate(R.layout.itinerary_destination_item, linearLayout, false);
+                TextView x = (TextView) view.findViewById(R.id.textView3);
+                x.setText(a.get(0));
+                break;
+            case 1:
+                view = inflater.inflate(R.layout.itenerary_travelmethod_item, linearLayout, false);
+                TextView y = (TextView) view.findViewById(R.id.textView3);
+                y.setText(a.get(0));
+                TextView f = (TextView) view.findViewById(R.id.textView4);
+                f.setText(a.get(1));
+                TextView k = (TextView) view.findViewById(R.id.textView5);
+                k.setText(a.get(2));
+                break;
+            default:
+                view = inflater.inflate(R.layout.itenerary_travelcab_interactive_item, linearLayout, false);
+                TextView z = (TextView) view.findViewById(R.id.textView3);
+                z.setText("Take a cab!");
+                TextView b = (TextView) view.findViewById(R.id.textView4);
+                b.setText(a.get(0));
+                TextView m = (TextView) view.findViewById(R.id.textView5);
+                m.setText(a.get(1));
+                break;
+        }
+
+        linearLayout.addView(view);
+    }
+
+    public void generateItinerary(PathsAndCost resultPnC){
+
+        copy2clip = "M Y   I T I N E R A R Y\n\n"; // String to store the text to copy onto clipboard.
+        linearLayout.removeAllViews();             // Removes all views before adding elements to Itinerary View.
+
+        for (int i = 0; i < resultPnC.getPath().size();i++){
+            ArrayList<String> xx = new ArrayList<>();
+            xx.add(resultPnC.getPath().get(i).getFrom());
+            genElement(xx, 0);
+
+
+            // Code below calls functions based on the input object resultPnC. Uses info to generate cards for travel <from 1 location> <using which mode of transport> <to which location> <time> and <cost>
+            if(i==0)
+                copy2clip = copy2clip + "Start from hotel!\n\n";
+            if(i!=0)
+                copy2clip = copy2clip + "Destination "+(i)+": "+resultPnC.getPath().get(i).getFrom()+"\n\n";
+
+            Double cost = resultPnC.getPath().get(i).getCost();
+            cost = round(cost * 100.00)/100.00;
+
+            if (resultPnC.getPath().get(i).getMode() == TRANSPORTATION.TAXI) {
+                xx = new ArrayList<>();
+                xx.add(Integer.toString(resultPnC.getPath().get(i).getDuration()));
+                xx.add("$"+Double.toString(cost));
+                copy2clip = copy2clip+"Take a cab for around "+"$"+Double.toString(cost)+" ("+Integer.toString(resultPnC.getPath().get(i).getDuration())+" mins)";
+                genElement(xx, 2);
+            }
+            else {
+                xx = new ArrayList<>();
+                if (resultPnC.getPath().get(i).getMode() == TRANSPORTATION.BUS) {
+                    xx.add("Take Public Transport");
+                    copy2clip = copy2clip+"Take public transport for around "+"$"+Double.toString(cost)+" ("+Integer.toString(resultPnC.getPath().get(i).getDuration())+" mins)";
+                }
+                else {
+                    xx.add("Take a Walk!");
+                    copy2clip = copy2clip+"Walk from here ("+Integer.toString(resultPnC.getPath().get(i).getDuration())+" mins)";
+                }
+                xx.add(Integer.toString(resultPnC.getPath().get(i).getDuration()));
+                xx.add("$"+Double.toString(cost));
+                genElement(xx,1);
+            }
+            copy2clip = copy2clip + "\n";
+
+        }
+
+        ArrayList<String> xx = new ArrayList<>();
+        xx.add(resultPnC.getPath().get(resultPnC.getPath().size()-1).getTo());
+        genElement(xx, 0);
+        copy2clip = copy2clip + "Back at your hotel!\n";
+    }
+
+
+    /*
+    Additional functionality
+     */
+
     public void maps(View v){
         animScreen = 1;
         nextScreen = 6;
         animationStart();
         currScreen = 6;
-    }
-
-    public static void hideKeyboard(Activity act) {
-        InputMethodManager inputMethodManager = (InputMethodManager) act.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(act.getCurrentFocus().getWindowToken(), 0);
     }
 
     public void onMapReady(GoogleMap googleMap) {
@@ -559,90 +718,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
     }
 
-    public void genElement(ArrayList<String> a, int type){
-
-
-        LayoutInflater inflater=LayoutInflater.from(this);
-        View view;
-
-        switch(type){
-            case 0:
-                view = inflater.inflate(R.layout.itinerary_destination_item, linearLayout, false);
-                TextView x = (TextView) view.findViewById(R.id.textView3);
-                x.setText(a.get(0));
-                break;
-            case 1:
-                view = inflater.inflate(R.layout.itenerary_travelmethod_item, linearLayout, false);
-                TextView y = (TextView) view.findViewById(R.id.textView3);
-                y.setText(a.get(0));
-                TextView f = (TextView) view.findViewById(R.id.textView4);
-                f.setText(a.get(1));
-                TextView k = (TextView) view.findViewById(R.id.textView5);
-                k.setText(a.get(2));
-                break;
-            default:
-                view = inflater.inflate(R.layout.itenerary_travelcab_interactive_item, linearLayout, false);
-                TextView z = (TextView) view.findViewById(R.id.textView3);
-                z.setText("Take a cab!");
-                TextView b = (TextView) view.findViewById(R.id.textView4);
-                b.setText(a.get(0));
-                TextView m = (TextView) view.findViewById(R.id.textView5);
-                m.setText(a.get(1));
-                break;
-        }
-
-        linearLayout.addView(view);
-    }
-
-    public void animationStart(){
-        animScreen = currScreen;
-        posAnimScreenOutLeft.start();
-        opAnimScreenOutLeft.start();
-        posAnimScreenInRight.start();
-        opAnimScreenInRight.start();
-        for (int i = 1; i < screens.size(); i++){
-            if (i != animScreen && i != nextScreen){
-                screens.get(i).setX(2000);
-            }
-        }
-    }
-
-    public void onBackPressed() {
-        if (currScreen == 1) super.onBackPressed();
-        else if (currScreen == 6 || currScreen == 7){
-            animScreen = currScreen;
-            nextScreen = 1;
-            posAnimScreenOutRight.start();
-            opAnimScreenOutRight.start();
-            posAnimScreenInLeft.start();
-            opAnimScreenInLeft.start();
-            for (int i = 1; i < screens.size(); i++){
-                if (i != animScreen && i != nextScreen){
-                    screens.get(i).setX(2000);
-                }
-            }
-            currScreen = 1;
-        }
-        else{
-            animScreen = currScreen;
-            nextScreen = currScreen - 1;
-            posAnimScreenOutRight.start();
-            opAnimScreenOutRight.start();
-            posAnimScreenInLeft.start();
-            opAnimScreenInLeft.start();
-            for (int i = 1; i < screens.size(); i++){
-                if (i != animScreen && i != nextScreen){
-                    screens.get(i).setX(2000);
-                }
-            }
-            currScreen -= 1;
-        }
-
-
-
-    }
-
     public void StartUber(View v){
+
+        // Method is used as an onClick for the imagebutton on the "take a cab" card in the itinerary list. Simply opens the uber app if it is installed on the host mobile.
+
         PackageManager pm = getPackageManager();
         try {
             pm.getPackageInfo("com.ubercab", PackageManager.GET_ACTIVITIES);
@@ -659,52 +738,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    public void generateItinerary(PathsAndCost resultPnC){
-        copy2clip = "M Y   I T I N E R A R Y\n\n";
-        linearLayout.removeAllViews();
-
-        for (int i = 0; i < resultPnC.getPath().size();i++){
-            ArrayList<String> xx = new ArrayList<>();
-            xx.add(resultPnC.getPath().get(i).getFrom());
-            genElement(xx, 0);
-            if(i==0)
-                copy2clip = copy2clip + "Start from hotel!\n\n";
-            if(i!=0)
-                copy2clip = copy2clip + "Destination "+(i)+": "+resultPnC.getPath().get(i).getFrom()+"\n\n";
-            Double cost = resultPnC.getPath().get(i).getCost();
-            cost = round(cost * 100.00)/100.00;
-            if (resultPnC.getPath().get(i).getMode() == TRANSPORTATION.TAXI) {
-                xx = new ArrayList<>();
-                xx.add(Integer.toString(resultPnC.getPath().get(i).getDuration()));
-                xx.add("$"+Double.toString(cost));
-                copy2clip = copy2clip+"Take a cab for around "+"$"+Double.toString(cost)+" for "+Integer.toString(resultPnC.getPath().get(i).getDuration())+"mins";
-                genElement(xx, 2);
-            }
-            else {
-                xx = new ArrayList<>();
-                if (resultPnC.getPath().get(i).getMode() == TRANSPORTATION.BUS) {
-                    xx.add("Take Public Transport");
-                    copy2clip = copy2clip+"Take public transport for around "+"$"+Double.toString(cost)+" for "+Integer.toString(resultPnC.getPath().get(i).getDuration())+"mins";
-                }
-                else {
-                    xx.add("Take a Walk!");
-                    copy2clip = copy2clip+"Walk from here for "+Integer.toString(resultPnC.getPath().get(i).getDuration())+"mins";
-                }
-                xx.add(Integer.toString(resultPnC.getPath().get(i).getDuration()));
-                xx.add("$"+Double.toString(cost));
-                genElement(xx,1);
-            }
-            copy2clip = copy2clip + "\n";
-
-        }
-
-        ArrayList<String> xx = new ArrayList<>();
-        xx.add(resultPnC.getPath().get(resultPnC.getPath().size()-1).getTo());
-        genElement(xx, 0);
-        copy2clip = copy2clip + "Back at your hotel!\n";
-    }
-
     public void Copy2Clip(View v){
+
+        // This method simply copies the formatted String created in generateItinerary() onto the clipboard
+
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("TravelItineraryAppStuff", copy2clip);
         clipboard.setPrimaryClip(clip);
