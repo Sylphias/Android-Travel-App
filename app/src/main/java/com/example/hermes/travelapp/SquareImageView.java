@@ -4,7 +4,9 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
-
+/*
+Ensures element is always square
+ */
 public class SquareImageView extends ImageView {
     public SquareImageView(Context context) {
         super(context);

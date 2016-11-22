@@ -18,6 +18,9 @@ import supportlib.TravelSQL;
 
 import static java.lang.Integer.parseInt;
 
+/*
+    Adapter for destinations GridView
+ */
 class ImageAdapter extends BaseAdapter {
     private final List<Item> mItems = new ArrayList<Item>();
     private final LayoutInflater mInflater;
@@ -28,11 +31,11 @@ class ImageAdapter extends BaseAdapter {
         SQLiteDatabase db = tsql.getWritableDatabase();
         tsql.onCreate(db);
         tsql.onUpgrade(db,0,1);
-        locations = tsql.getAllExceptHotel(hotel);
+        locations = tsql.getAllExceptHotel(hotel);                                                                          //Get locations to display, all except hotel user is staying in
 
         mInflater = LayoutInflater.from(context);
         for (int i = 0; i < locations.size(); i++) {
-            mItems.add(new Item(locations.get(i).getLocation(), locations.get(i).getImage(), locations.get(i).getId()));
+            mItems.add(new Item(locations.get(i).getLocation(), locations.get(i).getImage(), locations.get(i).getId()));    //Initialise new Item with name, image and location ID, add to list to display
         }
     }
 
@@ -69,19 +72,19 @@ class ImageAdapter extends BaseAdapter {
         name = (TextView) v.getTag(R.id.text);
         tick = (ImageView) v.getTag(R.id.imageViewTick);
 
-        Item item = getItem(i);
+        Item item = getItem(i);                                                 //Get item from mItems
 
-        picture.setImageResource(item.drawableId);
-        name.setText(item.name);
-        tick.setImageResource(R.mipmap.tick);
+        picture.setImageResource(item.drawableId);                              //Set element image resource as location image
+        name.setText(item.name);                                                //Set element name as location name
+        tick.setImageResource(R.mipmap.tick);                                   //Set element to have a tick image
 
         return v;
     }
 
     public static class Item {
-        public final String name;
-        public final int drawableId;
-        public final int locationId;
+        public final String name;       //Location name
+        public final int drawableId;    //Location image
+        public final int locationId;    //Location ID in database
 
         Item(String name, int drawableId, int locationId) {
             this.name = name;

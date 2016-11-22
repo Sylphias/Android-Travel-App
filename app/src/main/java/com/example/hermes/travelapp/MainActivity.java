@@ -82,19 +82,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     ItineraryStoreSQL isql;
 
 
-
     /*
     Main onCreate class
     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        screens.clear();
+        screens.clear(); //Initialise screens ArrayList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Create database for storing itinerary
         isql = new ItineraryStoreSQL(getApplicationContext());
         final SQLiteDatabase isdb = isql.getWritableDatabase();
-
         isql.onCreate(isdb);
+
+        //Create database for fetching locations
+        TravelSQL tsql = new TravelSQL(getApplicationContext());
+        SQLiteDatabase db = tsql.getWritableDatabase();
+        tsql.onUpgrade(db,1,2);
+
+        //Assign screens
         screen1 = (RelativeLayout) findViewById(R.id.content_main);
         screen2 = (RelativeLayout) findViewById(R.id.budget);
         screen3 = (RelativeLayout) findViewById(R.id.hotels);
@@ -103,6 +110,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         screen6 = (RelativeLayout) findViewById(R.id.maps);
         screen7 = (RelativeLayout) findViewById(R.id.itinerary_list);
         screen8 = (RelativeLayout) findViewById(R.id.activity_itinerary);
+
+        //Put other screens out of view
         screen1.setVisibility(View.VISIBLE);
         screen2.setX(2000);
         screen2.setVisibility(View.VISIBLE);
@@ -116,6 +125,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         screen6.setVisibility(View.VISIBLE);
         screen7.setX(2000);
         screen7.setVisibility(View.VISIBLE);
+
+        //Add screens to screens ArrayList
         screens.add(null);
         screens.add(screen1);
         screens.add(screen2);
@@ -125,25 +136,30 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         screens.add(screen6);
         screens.add(screen7);
         screens.add(screen8);
+
+        //App initialisation variable
         initial = 0;
-        TravelSQL tsql = new TravelSQL(getApplicationContext());
-        SQLiteDatabase db = tsql.getWritableDatabase();
-        tsql.onUpgrade(db,1,2);
 
+        //Hotels screen gridview
         final GridView hotelsview = (GridView) findViewById(R.id.hotelsview);
-        hotelsview.setAdapter(new HotelsAdapter(this));
+        hotelsview.setAdapter(new HotelsAdapter(this)); //Set adapter to populate hotelsview
 
+        //Destinations screen gridview
         final GridView gridview = (GridView) findViewById(R.id.gridview);
 
         hotelsview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                hotel = (int) hotelsview.getAdapter().getItemId(position);
-                selectedLoc.clear();
-                gridview.setAdapter(new ImageAdapter(MainActivity.this, hotel));
-                for (int i = 0; i < gridview.getChildCount(); i++){
+                hotel = (int) hotelsview.getAdapter().getItemId(position);                          //Get starting location
+                selectedLoc.clear();                                                                //Clear selected destinations
+                gridview.setAdapter(new ImageAdapter(MainActivity.this, hotel));                    //Set adapter to populate destinations gridview
+
+                //Remove all pre-existing ticks on destinations screen
+                for (int i = 0; i < gridview.getChildCount(); i++) {
                     gridview.getChildAt(i - gridview.getFirstVisiblePosition()).findViewById(R.id.imageViewTick).setVisibility(View.INVISIBLE);
                 }
+
+                //Set up screens for animation
                 animScreen = 3;
                 nextScreen = 4;
                 animationStart();
@@ -151,38 +167,42 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+        //When an element in destinations is clicked
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                if(! selectedLoc.contains((int) gridview.getAdapter().getItemId(position))){
+                if(! selectedLoc.contains((int) gridview.getAdapter().getItemId(position))){        //If not already selected, add to selectedLoc and display tick
                     selectedLoc.add((int) gridview.getAdapter().getItemId(position));
                     gridview.getChildAt(position - gridview.getFirstVisiblePosition()).findViewById(R.id.imageViewTick).setVisibility(View.VISIBLE);
                 }
-                else{
+                else{                                                                               //If already selected, remove from selectedLoc and hide tick
                     selectedLoc.remove(selectedLoc.indexOf((int) gridview.getAdapter().getItemId(position)));
                     gridview.getChildAt(position - gridview.getFirstVisiblePosition()).findViewById(R.id.imageViewTick).setVisibility(View.INVISIBLE);
                 }
             }
         });
 
+        //FAST ALGORITHM
         FloatingActionButton fastFab = (FloatingActionButton) findViewById(R.id.fastFab);
         linearLayout = (ViewGroup) findViewById(R.id.scroller);
         fastFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (selectedLoc.size() == 0){
+                if (selectedLoc.size() == 0){                                                                                           //Check if no elements are selected
                     Toast toast = Toast.makeText(MainActivity.this,"Select at least one location!", Toast.LENGTH_SHORT);
                     toast.show();
                 }
-                else{
+                else{                                                                                                                   //Else input into pathfinder
                     ArrayList<Integer> feedArray = new ArrayList<Integer>();
-                    for (int i = 0; i < selectedLoc.size(); i++) feedArray.add(selectedLoc.get(i));
-                    HashMap<Integer, Location> allLocations  = SearchUtils.getRawData(feedArray, getApplicationContext(), hotel);
-                    resultPnC = NearestNeighbour.getApproximatedPath(allLocations,budget,hotel);
+                    for (int i = 0; i < selectedLoc.size(); i++) feedArray.add(selectedLoc.get(i));                                     //Deepcopy ArrayList to prevent unintended modofications
+                    HashMap<Integer, Location> allLocations  = SearchUtils.getRawData(feedArray, getApplicationContext(), hotel);       //Initialise data for algorithm
+                    resultPnC = NearestNeighbour.getApproximatedPath(allLocations,budget,hotel);                                        //Run algorithm
                     SQLiteDatabase isdb = isql.getWritableDatabase();
-                    isql.insertItinerary(resultPnC, isdb, new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new java.util.Date()));
+                    isql.insertItinerary(resultPnC, isdb, new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new java.util.Date()));    //Write path and cost into itinerary history
                     isdb.close();
-                    generateItinerary(resultPnC);
+                    generateItinerary(resultPnC);                                                                                       //Generate itinerary for next screen
+
+                    //Set up screens for animation
                     animScreen = 4;
                     nextScreen = 5;
                     animationStart();
@@ -191,24 +211,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+        //EXAUSTIVE ALGORITHM
         FloatingActionButton normalFab = (FloatingActionButton) findViewById(R.id.normalFab);
         linearLayout = (ViewGroup) findViewById(R.id.scroller);
         normalFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (selectedLoc.size() == 0){
+                if (selectedLoc.size() == 0){                                                                                               //Check if no elements are selected
                     Toast toast = Toast.makeText(MainActivity.this,"Select at least one location!", Toast.LENGTH_SHORT);
                     toast.show();
                 }
-                else {
+                else {                                                                                                                      //Else input into pathfinder
                     ArrayList<Integer> feedArray = new ArrayList<Integer>();
-                    for (int i = 0; i < selectedLoc.size(); i++) feedArray.add(selectedLoc.get(i));
-                    HashMap<Integer, Location> allLocations = SearchUtils.getRawData(feedArray, getApplicationContext(), hotel);
-                    resultPnC = SearchUtils.getBestPath((ArrayList) SearchUtils.generateAllPaths(feedArray), budget, allLocations, hotel);
+                    for (int i = 0; i < selectedLoc.size(); i++) feedArray.add(selectedLoc.get(i));                                         //Deepcopy ArrayList to prevent unintended modofications
+                    HashMap<Integer, Location> allLocations = SearchUtils.getRawData(feedArray, getApplicationContext(), hotel);            //Initialise data for algorithm
+                    resultPnC = SearchUtils.getBestPath((ArrayList) SearchUtils.generateAllPaths(feedArray), budget, allLocations, hotel);  //Run algorithm
                     SQLiteDatabase isdb = isql.getWritableDatabase();
-                    isql.insertItinerary(resultPnC, isdb, new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new java.util.Date()));
+                    isql.insertItinerary(resultPnC, isdb, new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new java.util.Date()));        //Write path and cost into itinerary history
                     isdb.close();
-                    generateItinerary(resultPnC);
+                    generateItinerary(resultPnC);                                                                                           //Generate itinerary for next screen
+
+                    //Set up screens for animation
                     animScreen = 4;
                     nextScreen = 5;
                     animationStart();
@@ -217,20 +240,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-
-
+        //Initialise map fragment
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        //Button to submit location for search
         final Button locationSubmit = (Button) findViewById(R.id.mapSubmitBtn);
         locationSubmit.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                hideKeyboard(MainActivity.this);
+                hideKeyboard(MainActivity.this);                                                    //Hide keyboard
                 onMapSearch(v);
             }
         });
 
+        //Button to find nearby locations
         final Button nearbySubmit = (Button) findViewById(R.id.mapNearbyButton);
         nearbySubmit.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -239,14 +263,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-
+        //ListView for itinerary history
         final ListView itineraryList = (ListView) findViewById(R.id.itineraryList);
+
+        //Button to check itinerary history
         final Button checkItinerary = (Button) findViewById(R.id.checkItinerary);
         checkItinerary.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 ItineraryStoreSQL isql = new ItineraryStoreSQL(getApplicationContext());
-                pncList = isql.getAllItineraries();
-                itineraryList.setAdapter(new ListAdapter(MainActivity.this, pncList));
+                pncList = isql.getAllItineraries();                                                 //Get all past itineraries
+                itineraryList.setAdapter(new ListAdapter(MainActivity.this, pncList));              //Set adapter to populate itineraryList
+
+                //Set up screens for animation
                 animScreen = 1;
                 nextScreen = 7;
                 animationStart();
@@ -254,24 +282,31 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+        //Button to clear history
         FloatingActionButton clearHistory = (FloatingActionButton) findViewById(R.id.clearHistory);
         clearHistory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                pncList.clear();
+                pncList.clear();                                                                    //Clear display array
+
+                //Reinitialise database for history
                 ItineraryStoreSQL isql = new ItineraryStoreSQL(getApplicationContext());
                 SQLiteDatabase db = isql.getWritableDatabase();
                 isql.deleteTable();
                 isql.onCreate(db);
-                itineraryList.setAdapter(new ListAdapter(MainActivity.this, pncList));
+
+                itineraryList.setAdapter(new ListAdapter(MainActivity.this, pncList));              //Reset adapter to populate itineraryList
             }
         });
 
+        //When a ListView element is clicked
         itineraryList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                resultPnC = pncList.get(position);
-                generateItinerary(resultPnC);
+                resultPnC = pncList.get(position);                                                  //Fetch PathsAndCost object associated with history item
+                generateItinerary(resultPnC);                                                       //Generate itinerary based on selected item
+
+                //Set up screens for animation
                 animScreen = 7;
                 nextScreen = 8;
                 animationStart();
@@ -288,6 +323,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
 
+        //ANIMATES A SCREEN OUT OF THE LEFT SIDE OF THE SCREEN
+        //Position
         posAnimScreenOutLeft = ValueAnimator.ofFloat(0, -1 * screen1.getWidth());
         posAnimScreenOutLeft.setDuration(600);
         posAnimScreenOutLeft.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -297,6 +334,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 screens.get(animScreen).requestLayout();
             }
         });
+        //Alpha
         opAnimScreenOutLeft = ValueAnimator.ofFloat(1, 0);
         opAnimScreenOutLeft.setDuration(600);
         opAnimScreenOutLeft.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -307,6 +345,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+        //ANIMATES A SCREEN OUT OF THE RIGHT SIDE OF THE SCREEN
+        //Position
         posAnimScreenOutRight = ValueAnimator.ofFloat(0, screen1.getWidth());
         posAnimScreenOutRight.setDuration(600);
         posAnimScreenOutRight.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -316,6 +356,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 screens.get(animScreen).requestLayout();
             }
         });
+        //Alpha
         opAnimScreenOutRight = ValueAnimator.ofFloat(1, 0);
         opAnimScreenOutRight.setDuration(600);
         opAnimScreenOutRight.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -326,6 +367,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+        //ANIMATES A SCREEN IN FROM THE LEFT SIDE OF THE SCREEN
+        //Position
         posAnimScreenInLeft = ValueAnimator.ofFloat(-1 * screen1.getWidth(), 0);
         posAnimScreenInLeft.setDuration(600);
         posAnimScreenInLeft.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -335,6 +378,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 screens.get(nextScreen).requestLayout();
             }
         });
+        //Alpha
         opAnimScreenInLeft = ValueAnimator.ofFloat(0, 1);
         opAnimScreenInLeft.setDuration(600);
         opAnimScreenInLeft.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -345,6 +389,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+        //ANIMATES A SCREEN IN FROM THE RIGHT SIDE OF THE SCREEN
+        //Position
         posAnimScreenInRight = ValueAnimator.ofFloat(screen1.getWidth(),0);
         posAnimScreenInRight.setDuration(600);
         posAnimScreenInRight.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -354,6 +400,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 screens.get(nextScreen).requestLayout();
             }
         });
+        //Alpha
         opAnimScreenInRight = ValueAnimator.ofFloat(0, 1);
         opAnimScreenInRight.setDuration(600);
         opAnimScreenInRight.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -364,9 +411,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+        //INITIAL ANIMATION
         if (initial == 0) {
+
+            //Prompting textview
+            //Position
             final TextView what = (TextView) findViewById(R.id.textView2);
-            posAnim = ValueAnimator.ofFloat(screen1.getHeight() / 2 - 150, screen1.getHeight() / 2 - 350);//1000, 800);
+            posAnim = ValueAnimator.ofFloat(screen1.getHeight() / 2 - 150, screen1.getHeight() / 2 - 350);//1000, 800); PREV DATA
             posAnim.setDuration(1000).setStartDelay(250);
             posAnim.start();
             posAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -376,6 +427,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     what.requestLayout();
                 }
             });
+            //Alpha
             opAnim = ValueAnimator.ofFloat(0, 1);
             opAnim.setDuration(1000).setStartDelay(250);
             opAnim.start();
@@ -387,6 +439,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             });
 
+            //First button
+            //Position
             final Button newTrip = (Button) findViewById(R.id.newTrip);
             posAnim1 = ValueAnimator.ofFloat(screen1.getHeight() / 2 + 200, screen1.getHeight() / 2);//1000, 800);
             posAnim1.setDuration(800).setStartDelay(750);
@@ -398,6 +452,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     newTrip.requestLayout();
                 }
             });
+            //Alpha
             opAnim1 = ValueAnimator.ofFloat(0, 1);
             opAnim1.setDuration(800).setStartDelay(750);
             opAnim1.start();
@@ -409,6 +464,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             });
 
+            //Second button
+            //Position
             final Button checkItinerary = (Button) findViewById(R.id.checkItinerary);
             posAnim2 = ValueAnimator.ofFloat(screen1.getHeight() / 2 + 350, screen1.getHeight() / 2 + 150);//1150, 950);
             posAnim2.setDuration(800).setStartDelay(900);
@@ -420,6 +477,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     checkItinerary.requestLayout();
                 }
             });
+            //Alpha
             opAnim2 = ValueAnimator.ofFloat(0, 1);
             opAnim2.setDuration(800).setStartDelay(900);
             opAnim2.start();
@@ -431,6 +489,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             });
 
+            //Third Button
+            //Position
             final Button settings = (Button) findViewById(R.id.settings);
             posAnim3 = ValueAnimator.ofFloat(screen1.getHeight() / 2 + 500, screen1.getHeight() / 2 + 300);//1300, 1100);
             posAnim3.setDuration(800).setStartDelay(1050);
@@ -442,6 +502,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     settings.requestLayout();
                 }
             });
+            //Alpha
             opAnim3 = ValueAnimator.ofFloat(0, 1);
             opAnim3.setDuration(800).setStartDelay(1050);
             opAnim3.start();
@@ -452,16 +513,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     settings.requestLayout();
                 }
             });
-            initial = 1;
+            initial = 1; //Only do initial animations once
         }
     }
 
+    //Start animations
     public void animationStart(){
-        animScreen = currScreen;
-        posAnimScreenOutLeft.start();
-        opAnimScreenOutLeft.start();
-        posAnimScreenInRight.start();
-        opAnimScreenInRight.start();
+        animScreen = currScreen;                        //Move out current screen
+        posAnimScreenOutLeft.start();                   //Move current screen out to the left side
+        opAnimScreenOutLeft.start();                    //Decrease current screen alpha to 0
+        posAnimScreenInRight.start();                   //Move next screen in from the right side
+        opAnimScreenInRight.start();                    //Increase next screen alpha to 1
+
+        //Move all other screens out of view
         for (int i = 1; i < screens.size(); i++){
             if (i != animScreen && i != nextScreen){
                 screens.get(i).setX(2000);
@@ -469,46 +533,53 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    //When back button is pressed
     public void onBackPressed() {
-        if (currScreen == 1) super.onBackPressed();
-        else if (currScreen == 6 || currScreen == 7){
-            animScreen = currScreen;
-            nextScreen = 1;
-            posAnimScreenOutRight.start();
-            opAnimScreenOutRight.start();
-            posAnimScreenInLeft.start();
-            opAnimScreenInLeft.start();
+        if (currScreen == 1) super.onBackPressed();     //If at main screen, exit app
+        else if (currScreen == 6 || currScreen == 7){   //If at maps screen or itinerary history screen
+            animScreen = currScreen;                    //Move out current screen
+            nextScreen = 1;                             //Move in main screen
+            posAnimScreenOutRight.start();              //Move current screen out to the right side
+            opAnimScreenOutRight.start();               //Decrease current screen alpha to 0
+            posAnimScreenInLeft.start();                //Move main screen in from the left side
+            opAnimScreenInLeft.start();                 //Increase main screen alpha to 1
+
+            //Move all other screens out of view
             for (int i = 1; i < screens.size(); i++){
                 if (i != animScreen && i != nextScreen){
                     screens.get(i).setX(2000);
                 }
             }
-            currScreen = 1;
+            currScreen = 1;                             //Current screen is now main screen
         }
         else{
             animScreen = currScreen;
             nextScreen = currScreen - 1;
-            posAnimScreenOutRight.start();
-            opAnimScreenOutRight.start();
-            posAnimScreenInLeft.start();
-            opAnimScreenInLeft.start();
+            posAnimScreenOutRight.start();              //Move current screen out to the right side
+            opAnimScreenOutRight.start();               //Decrease current screen alpha to 0
+            posAnimScreenInLeft.start();                //Move next screen in from the left side
+            opAnimScreenInLeft.start();                 //Increase next screen alpha to 1
+
+            //Move all other screens out of view
             for (int i = 1; i < screens.size(); i++){
                 if (i != animScreen && i != nextScreen){
                     screens.get(i).setX(2000);
                 }
             }
-            currScreen -= 1;
+            currScreen -= 1;                            //Decrement current screen
         }
 
 
 
     }
 
+    //To hide keyboard
     public static void hideKeyboard(Activity act) {
         InputMethodManager inputMethodManager = (InputMethodManager) act.getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(act.getCurrentFocus().getWindowToken(), 0);
     }
 
+    //When new trip is selected
     public void budget(View v){
         animScreen = 1;
         nextScreen = 2;
@@ -516,14 +587,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         currScreen = 2;
     }
 
+    //To submit budget
     public void submitBudget(View v){
-        if ((((EditText) findViewById(R.id.editText2)).getText().toString()).equals("")){
+        if ((((EditText) findViewById(R.id.editText2)).getText().toString()).equals("")){                   //If TextView is empty, prompt for entry
             Toast toast = Toast.makeText(this,"Invalid entry!", Toast.LENGTH_SHORT);
             toast.show();
         }
         else{
-            budget = Double.parseDouble(((EditText) findViewById(R.id.editText2)).getText().toString());
+            budget = Double.parseDouble(((EditText) findViewById(R.id.editText2)).getText().toString());    //Convert entry to double, store as budget
             hideKeyboard(MainActivity.this);
+
+            //Set up screens for animation
             animScreen = 2;
             nextScreen = 3;
             animationStart();
@@ -578,6 +652,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         linearLayout.addView(view);
     }
 
+    //To generate itinerary to display
     public void generateItinerary(PathsAndCost resultPnC){
 
         copy2clip = "M Y   I T I N E R A R Y\n\n"; // String to store the text to copy onto clipboard.
@@ -634,13 +709,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     Additional functionality
      */
 
+    //When places of interest is selected
     public void maps(View v){
+        //Set up screens for animation
         animScreen = 1;
         nextScreen = 6;
         animationStart();
         currScreen = 6;
     }
 
+    //Initialise Google Maps
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
@@ -650,6 +728,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(curr, 10.0f));
     }
 
+    //Search for location on map
     public void onMapSearch(View view) {
         EditText locationSearch = (EditText) findViewById(R.id.mapsEdittext);
         String location = locationSearch.getText().toString();
@@ -657,6 +736,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Context context = getApplicationContext();
         int duration = Toast.LENGTH_SHORT;
 
+        //Call Google Maps functions
         if (location != null || !location.equals("") || location.length() != 0) {
             Geocoder geocoder = new Geocoder(this);
             try {
@@ -676,7 +756,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     Toast toast = Toast.makeText(context, "Location Unknown", duration);
                     toast.show();
                 }
-            } catch (IOException e) {
+            } catch (IOException e) {                                                               //Exception handler
                 System.err.println(e);
                 Toast toast = Toast.makeText(context, "Location Unknown", duration);
                 toast.show();
@@ -684,6 +764,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    //Search all locations near current location
     public void nearbySearch(View v){
         ArrayList<ArrayList<String>> nearby = HawkerUtils.getNearbyHawkers(HawkerUtils.getHawkerLocations(getResources()),curr.latitude,curr.longitude);
         if(nearby.size() ==0){
@@ -696,14 +777,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    //Change map view to roadmap view
     public void roadmap(View v){
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
     }
 
+    //Change map view to satellite view
     public void satellite(View v){
         mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
     }
 
+    //Call Uber app
     public void StartUber(View v){
 
         // Method is used as an onClick for the imagebutton on the "take a cab" card in the itinerary list. Simply opens the uber app if it is installed on the host mobile.
