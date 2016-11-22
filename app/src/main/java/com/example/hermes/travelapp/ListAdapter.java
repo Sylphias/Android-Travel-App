@@ -15,10 +15,9 @@ import java.util.List;
 import supportlib.Location;
 import supportlib.PathsAndCost;
 
-/**
- * Created by Wei Ren on 22/11/2016.
+/*
+    Adapter for Itinerary History ListView
  */
-
 public class ListAdapter extends BaseAdapter {
     private final LayoutInflater mInflater;
     private ArrayList<PathsAndCost> pncList = new ArrayList<PathsAndCost>();
@@ -55,9 +54,9 @@ public class ListAdapter extends BaseAdapter {
 
         name = (TextView) v.getTag(R.id.listItemName);
 
-        PathsAndCost item = getItem(i);
+        PathsAndCost item = getItem(i);                                             //Get PathsAndCost object from history element
 
-        name.setText(((PathsAndCost) item).getName());
+        name.setText(((PathsAndCost) item).getName());                              //Set name to display on ListView
 
         return v;
     }
